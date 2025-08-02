@@ -453,7 +453,7 @@ namespace R.E.P.O.Roles
     			}
     			guiManager.ResetManaUI();
     			RepoRoles.Logger.LogInfo("Resetting Mana UI.");
-    			RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameReaper.Value + "."));
+    			RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameScout.Value + "."));
     			isScout = true;
     			__instance.EnergyStart = (origMaxEnergy + (float)num3 * 10f) * 2f;
     			__instance.EnergyCurrent = (origMaxEnergy + (float)num3 * 10f) * 2f;

@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using Repo_Roles;
+using UnityEngine;
 using HarmonyLib;
 
 namespace R.E.P.O.Roles

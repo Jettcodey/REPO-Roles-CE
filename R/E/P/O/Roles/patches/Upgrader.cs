@@ -6,7 +6,7 @@ namespace R.E.P.O.Roles.patches
 {
     public class Upgrader : MonoBehaviour
     {
-    	private ItemToggle _itemToggle;
+    	public ItemToggle _itemToggle;
 
     	private void Start()
     	{
