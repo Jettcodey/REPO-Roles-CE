@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-[assembly: AssemblyTitle("REPO Roles Classic")]
-[assembly: AssemblyDescription("REPO Roles Mod for R.E.P.O.! Originally developed by KingRobin72, updated by the Community.")]
+[assembly: AssemblyTitle("REPO Roles Community Editon (CE)")]
+[assembly: AssemblyDescription("REPO Roles Mod for R.E.P.O.! Originally developed by KingRobin72, updated by R3Labs.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("KingRobin72, R3Labs")]
-[assembly: AssemblyProduct("REPO Roles Classic")]
+[assembly: AssemblyProduct("REPO Roles CE")]
 [assembly: AssemblyCopyright("")]
 
 [assembly: ComVisible(false)]
