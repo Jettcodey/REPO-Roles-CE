@@ -361,7 +361,7 @@ namespace Repo_Roles
     		customRoleNameMage = Config.Bind(customRoleNameMageDef, "Mage", null);
     		customRoleNameReaper = Config.Bind(customRoleNameReaperDef, "Reaper", null);
     		customRoleNameScout = Config.Bind(customRoleNameScoutDef, "Scout", null);
-            customRoleNameRegular = Config.Bind(customRoleDesRegularDef, "Regular", null);
+            customRoleNameRegular = Config.Bind(customRoleNameRegularDef, "Regular", null);
             customRoleDecRunner = Config.Bind(customRoleDesRunnerDef, "You have more stamina and run much faster than everyone else!", null);
     		customRoleDecTank = Config.Bind(customRoleDesTankDef, "You walk slower but your hp is doubled!", null);
     		customRoleDecGambler = Config.Bind(customRoleDesGamblerDef, "You rolled random effects:", null);
