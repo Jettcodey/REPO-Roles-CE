@@ -6,10 +6,10 @@ namespace Repo_Roles
 {
 	public static class MyPluginInfo
 	{
-		public const string PLUGIN_GUID = "CE.Repo_Roles";
+		public const string PLUGIN_GUID = "R3Labs.Repo_Roles";
 
-		public const string PLUGIN_NAME = "REPO Roles";
+		public const string PLUGIN_NAME = "REPO Roles Classic";
 
-		public const string PLUGIN_VERSION = "2.0.7";
+		public const string PLUGIN_VERSION = "2.1.0";
 	}
 }

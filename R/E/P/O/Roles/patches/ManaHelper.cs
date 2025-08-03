@@ -25,7 +25,7 @@ namespace R.E.P.O.Roles.patches
 			val = GameObject.Find("Energy");
 			if (val == null)
 			{
-				RepoRoles.Logger.LogError("[Repo Roles] Could not find base 'Energy' UI. Mana UI cannot be created.");
+				RepoRoles.Logger.LogError("Could not find base 'Energy' UI. Mana UI cannot be created.");
 				return;
 			}
 
@@ -33,7 +33,7 @@ namespace R.E.P.O.Roles.patches
 			val2 = Object.Instantiate(val, val.transform.parent);
 			if (val2 == null)
 			{
-				RepoRoles.Logger.LogError("[Repo Roles] Failed to instantiate Mana UI.");
+				RepoRoles.Logger.LogError("Failed to instantiate Mana UI.");
 				return;
 			}
 
@@ -49,7 +49,7 @@ namespace R.E.P.O.Roles.patches
 			foreach (var tmp in val2.GetComponentsInChildren<TextMeshProUGUI>(true))
 			{
 				if (tmp != null)
-					tmp.color = new Color(0f, 0.384f, 1f); // Blue tone
+					tmp.color = new Color(0f, 0.384f, 1f); // Blue
 			}
 
 			// Set mana icon
@@ -65,12 +65,12 @@ namespace R.E.P.O.Roles.patches
 				}
 				else
 				{
-					RepoRoles.Logger.LogWarning("[Repo Roles] Mana UI Image component not found.");
+					RepoRoles.Logger.LogWarning("Mana UI Image component not found.");
 				}
 			}
 			else
 			{
-				RepoRoles.Logger.LogWarning("[Repo Roles] guiManager.manaTexture is null!");
+				RepoRoles.Logger.LogWarning("guiManager.manaTexture is null!");
 			}
 
 			// Add ManaUI

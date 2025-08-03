@@ -40,7 +40,7 @@ namespace R.E.P.O.Roles.patches
 
 				if (textMana == null || textManaMax == null)
 				{
-					RepoRoles.Logger.LogWarning("[Repo Roles] ManaUI.SetMana called but UI references are null.");
+					RepoRoles.Logger.LogWarning("ManaUI.SetMana called but UI references are null.");
 					return;
 				}
 			}

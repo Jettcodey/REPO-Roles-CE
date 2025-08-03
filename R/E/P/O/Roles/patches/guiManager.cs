@@ -337,7 +337,7 @@ namespace R.E.P.O.Roles.patches
     		{
     			ManaHelper.val2.SetActive(false);
     		}
-    		else if (!RepoRoles.mageTopManaBool && isMage && (Object)(object)ManaHelper.val != null && (Object)(object)ManaHelper.val2 != (Object)null && !ManaHelper.val2.activeInHierarchy)
+    		else if (!RepoRoles.mageTopManaBool && isMage && (Object)(object)ManaHelper.val != null && (Object)(object)ManaHelper.val2 != null && !ManaHelper.val2.activeInHierarchy)
     		{
     			ManaHelper.val2.SetActive(true);
     			((Behaviour)ManaHelper.val2.gameObject.GetComponent<ManaUI>().uiText).enabled = true;
@@ -345,7 +345,7 @@ namespace R.E.P.O.Roles.patches
     		if (!SemiFunc.RunIsLevel())
     		{
     			isMage = false;
-    			if (Sender.manager != null && (Object)(object)PlayerAvatar.instance != (Object)null)
+    			if (Sender.manager != null && (Object)(object)PlayerAvatar.instance != null)
     			{
     				Sender.manager.setReaperStatus(PlayerController.instance.playerSteamID, isReaper: false);
     			}

@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-    [BepInPlugin("CE.Repo_Roles", "REPO Roles", "2.0.7")]
+    [BepInPlugin("R3Labs.Repo_Roles", "REPO Roles Classic", "2.1.0")]
     [BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("MenuLib", BepInDependency.DependencyFlags.SoftDependency)]
     public class RepoRoles : BaseUnityPlugin
@@ -66,7 +66,9 @@ namespace Repo_Roles
 
     	public static ConfigEntry<string> customRoleNameScout;
 
-    	public static ConfigEntry<string> customRoleDecRunner;
+        public static ConfigEntry<string> customRoleNameRegular;
+
+        public static ConfigEntry<string> customRoleDecRunner;
 
     	public static ConfigEntry<string> customRoleDecTank;
 
@@ -84,7 +86,9 @@ namespace Repo_Roles
 
     	public static ConfigEntry<string> customRoleDecScout;
 
-    	public static ConfigEntry<string> savedRole;
+        public static ConfigEntry<string> customRoleDecRegular;
+
+        public static ConfigEntry<string> savedRole;
 
     	public static ConfigEntry<bool> assignRoleAfterRevive;
 
@@ -118,7 +122,9 @@ namespace Repo_Roles
 
     	public ConfigDefinition customRoleNameScoutDef = new ConfigDefinition("Role Names", "Scout Name");
 
-    	public ConfigDefinition customRoleDesRunnerDef = new ConfigDefinition("Role Descriptions", "Runner Description");
+        public ConfigDefinition customRoleNameRegularDef = new ConfigDefinition("Role Names", "Regular Name");
+
+        public ConfigDefinition customRoleDesRunnerDef = new ConfigDefinition("Role Descriptions", "Runner Description");
 
     	public ConfigDefinition customRoleDesTankDef = new ConfigDefinition("Role Descriptions", "Tank Description");
 
@@ -136,7 +142,9 @@ namespace Repo_Roles
 
     	public ConfigDefinition customRoleDesScoutDef = new ConfigDefinition("Role Descriptions", "Scout Description");
 
-    	public ConfigDefinition showSpellsDef = new ConfigDefinition("Mage", "Show Spells");
+        public ConfigDefinition customRoleDesRegularDef = new ConfigDefinition("Role Descriptions", "Regular Description");
+
+        public ConfigDefinition showSpellsDef = new ConfigDefinition("Mage", "Show Spells");
 
     	public ConfigDefinition healDef = new ConfigDefinition("Mage", "Healing Spell");
 
@@ -170,6 +178,8 @@ namespace Repo_Roles
 
     	public static ConfigEntry<bool> enableScout;
 
+        public static ConfigEntry<bool> enableRegular;
+
     	public ConfigDefinition enableRunnerDef = new ConfigDefinition("Role", "Enable Runner");
 
     	public ConfigDefinition enableTankDef = new ConfigDefinition("Role", "Enable Tank");
@@ -188,7 +198,9 @@ namespace Repo_Roles
 
     	public ConfigDefinition enableScoutDef = new ConfigDefinition("Role", "Enable Scout");
 
-    	private REPOSlider slider;
+        public ConfigDefinition enableRegularDef = new ConfigDefinition("Role", "Enable Regular");
+
+        private REPOSlider slider;
 
     	private REPOPopupPage configPage;
 
@@ -249,7 +261,8 @@ namespace Repo_Roles
     		enableMage = Config.Bind(enableMageDef, true, null);
     		enableReaper = Config.Bind(enableReaperDef, true, null);
     		enableScout = Config.Bind(enableScoutDef, true, null);
-    		Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded successfully.");
+            enableRegular = Config.Bind(enableRegularDef, true, null);
+            Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded successfully.");
     		MenuAPI.AddElementToSettingsMenu((BuilderDelegate)delegate (Transform parent)
     		{
     			if ((UnityEngine.Object)(object)configPage == null)
@@ -267,7 +280,7 @@ namespace Repo_Roles
     					slider = MenuAPI.CreateREPOSlider("REPO Roles", "Choose your role", (Action<string>)delegate (string s)
     					{
     						sliderConf(s);
-    					}, scrollView, new string[10] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
+    					}, scrollView, new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
                     }
     				return ((REPOElement)slider).rectTransform;
     			}, 0f, 0f);
@@ -348,7 +361,8 @@ namespace Repo_Roles
     		customRoleNameMage = Config.Bind(customRoleNameMageDef, "Mage", null);
     		customRoleNameReaper = Config.Bind(customRoleNameReaperDef, "Reaper", null);
     		customRoleNameScout = Config.Bind(customRoleNameScoutDef, "Scout", null);
-    		customRoleDecRunner = Config.Bind(customRoleDesRunnerDef, "You have more stamina and run much faster than everyone else!", null);
+            customRoleNameRegular = Config.Bind(customRoleDesRegularDef, "Regular", null);
+            customRoleDecRunner = Config.Bind(customRoleDesRunnerDef, "You have more stamina and run much faster than everyone else!", null);
     		customRoleDecTank = Config.Bind(customRoleDesTankDef, "You walk slower but your hp is doubled!", null);
     		customRoleDecGambler = Config.Bind(customRoleDesGamblerDef, "You rolled random effects:", null);
     		customRoleDecStrongman = Config.Bind(customRoleDesStrongmanDef, "You\u00b4re incredibly strong!", null);
@@ -357,6 +371,7 @@ namespace Repo_Roles
     		customRoleDecMage = Config.Bind(customRoleDesMageDef, "You are able to use your mana to become incredibly strong!", null);
     		customRoleDecReaper = Config.Bind(customRoleDesReaperDef, "For each enemy you and your friends kill, you become stronger!", null);
     		customRoleDecScout = Config.Bind(customRoleDesScoutDef, "Your stamina is more efficient and by pressing [G] you can see all enemies around you.", null);
+            customRoleDecRegular = Config.Bind(customRoleDesRegularDef, "You are just a regular Semibot. Nothing special.", null);
     		scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
     		harmony.PatchAll(typeof(PunManagerPatch));
     		harmony.PatchAll(typeof(PlayerAvatarPatch));

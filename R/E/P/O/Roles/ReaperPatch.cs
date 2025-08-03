@@ -14,7 +14,7 @@ namespace R.E.P.O.Roles
     	[HarmonyPrefix]
     	public static void PrefixMethod()
     	{
-    		if ((Object)(object)((Component)SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID)).GetComponent<ReaperManager>() != (Object)null)
+    		if ((Object)(object)((Component)SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID)).GetComponent<ReaperManager>() != null)
     		{
     			rMan = ((Component)SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID)).GetComponent<ReaperManager>();
     		}
@@ -22,7 +22,7 @@ namespace R.E.P.O.Roles
     		{
     			RepoRoles.Logger.LogError((object)"Failed to get Reaper Manager! Please contact the mod developer about this.");
     		}
-    		if (rMan.isReaper && (Object)(object)rMan != (Object)null)
+    		if (rMan.isReaper && (Object)(object)rMan != null)
     		{
     			rMan.kills++;
     		}
