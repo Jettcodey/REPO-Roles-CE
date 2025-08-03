@@ -6,7 +6,7 @@ namespace Repo_Roles
 {
 	public static class MyPluginInfo
 	{
-		public const string PLUGIN_GUID = "R3Labs.Repo_Roles";
+		public const string PLUGIN_GUID = "R3Labs.Repo_Roles.CE";
 
 		public const string PLUGIN_NAME = "REPO Roles CE";
 
