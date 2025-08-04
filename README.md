@@ -12,8 +12,7 @@
   <li><a href="#credits">Credits</a></li>
 </ol>
 
-While you wait for the Community Edition to be released, you can check out [REPORoles Classic](https://thunderstore.io/c/repo/p/R3Labs/REPORoles_Classic/), our updated version of the original mod\
- with all its features working in the latest version of R.E.P.O. so you can play it with your friends right now!
+While you wait for the Community Edition to be released, you can check out [REPORoles Classic](https://thunderstore.io/c/repo/p/R3Labs/REPORoles_Classic/), our updated version of the original mod with all its features working in the latest version of R.E.P.O. so you can play it with your friends right now!
 
 REPORoles CE is a gameplay mod that introduces unique player roles for the Game [R.E.P.O.](https://store.steampowered.com/app/3241660/REPO/).
 
