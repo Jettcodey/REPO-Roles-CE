@@ -1,55 +1,62 @@
-# R.E.P.O. Roles (Community Edition)
+# REPORoles CE (Community Edition)
 
 > [!CAUTION]
-> THE UPDATE IS STILL WORK IN PROGRESS! SOME FEATURES MAY NOT WORK AS INTENDED!
+> **REPORoles CE IS STILL WORK IN PROGRESS! NOT FEATURE COMPLETE AND SOME FEATURES MAY NOT WORK AS INTENDED!**
 
-> [!NOTE]
-> This is a community-maintained fork of [KingRobin72's R.E.P.O. Roles mod](https://github.com/KingRobin72/REPO-Roles).
-> The original creator, [KingRobin72](https://github.com/KingRobin72), has made the source public after stepping away from development.
-> Anyone is welcome to contribute, whether it's code, artwork, ideas, or bug reports.
-> Full credit goes to [KingRobin72](https://github.com/KingRobin72) and all [previous contributors](#credits).
+<ol>
+  <li><a href="#quick-info">Quick Info</a></li>
+  <li><a href="#available-roles">Available Roles</a></li>
+  <li><a href="#role-upgrades">Role Upgrades</a></li>
+  <li><a href="#report-a-bugrequest-a-feature">Report a Bug/Request a Feature</a></li>
+  <li><a href="#contribute">Contribute</a></li>
+  <li><a href="#credits">Credits</a></li>
+</ol>
 
-R.E.P.O. Roles is a gameplay mod that introduces unique player roles.
-At the start of each game, players are assigned a role — either randomly or manually via the settings menu.
+While you wait for the Community Edition to be released, you can check out [REPORoles Classic](https://thunderstore.io/c/repo/p/R3Labs/REPORoles_Classic/), our updated version of the original mod\
+ with all its features working in the latest version of R.E.P.O. so you can play it with your friends right now!
 
-To select your role, go to **Mods → REPO Roles Config**, or leave it on random for a surprise.
+REPORoles CE is a gameplay mod that introduces unique player roles for the Game [R.E.P.O.](https://store.steampowered.com/app/3241660/REPO/).
 
 ---
+### Quick Info
 
-### 🔧 Quick Info
+- To select your role, go to **Mods → REPO Roles CE**, or leave it on random for a surprise.
 
 - When a game begins, a role is automatically assigned.
+
 - Press **R** (by default) in-game to view your current role.
+
 - All keybinds are configurable in the mod’s settings.
-- Additional roles and improvements are planned for future updates.
-- Found a bug or have a suggestion? Join the community on [Discord](https://discord.gg/edqFjB7T) and let us know!
 
 ---
+### Available Roles
 
-### 🎭 Available Roles
+- **Runner** – Moves faster than other players.
+- **Tank** – Has double health, but reduced speed.
+- **Gambler** – Receives one random buff and one debuff each game.
+- **Strongman** – Deals increased melee damage.
+- **Ranged Looter** – Has increased range and slightly more strength.
+- **Athletic** – Gains more stamina, strength, and higher jumps.
+- **Mage** – Wields powerful magic through spells.
+- **Reaper** – Grows stronger with each enemy defeated by you or your team.
+- **Scout** – Uses less stamina and can see enemies through walls.
+- **Regular** – You are just a regular Semibot. Nothing special.
 
-- **The Runner** – Moves faster than other players.
-- **The Tank** – Has double health, but reduced speed.
-- **The Gambler** – Receives one random buff and one debuff each game.
-- **The Strongman** – Deals increased melee damage.
-- **The Ranged Looter** – Has increased range and slightly more strength.
-- **The Athletic** – Gains more stamina, strength, and higher jumps.
-- **The Mage** – Wields powerful magic through spells.
-- **The Reaper** – Grows stronger with each enemy defeated by you or your team.
-- **The Scout** – Uses less stamina and can see enemies through walls.
-
----
-
-### ⬆️ Role Upgrades
+### Role Upgrades
 
 - **Mana Regeneration** – Reduces mana regen time for Mages. Max level: 5
 - **Scout Cooldown** – Shortens cooldown duration for the Scout’s ability. Max level: 5
 
 ---
+### Report a Bug/Request a Feature:
+- You can request Features and report Bugs on our [Community Discord](https://discord.gg/AyG5Z8xR6m)
 
-### 🙌 Credits
+### Contribute
+**Anyone is welcome to contribute, whether it's code, artwork, or new Roles.**
+
+### Credits
 
 - **KingRobin72** – Original creator of the mod and its core design.
 - **Grimgar** – Original creator of the Icon and Mod Art in-game.
-- **surf** – Originally helped design the new mana UI (creator of [*Walkie Talkies*](https://thunderstore.io/c/repo/p/surfknasen/Walkie_Talkies/) mod).
+- **surf** – Originally helped design the new mana UI (creator of [Walkie Talkies](https://thunderstore.io/c/repo/p/surfknasen/Walkie_Talkies/) mod).
 - **101m_m** – Originally designed the Mods Shop Upgrades.
