@@ -413,7 +413,8 @@ namespace R.E.P.O.Roles
                         RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameMage.Value + "."));
                         guiManager.isMage = true;
                         guiManager.aviableMana = 8;
-                        ManaHelper.CreateUI();      // <-- might be called to early here, needs more testing
+                        ManaHelper.CreateUI();
+                        guiManager.manaTicks = 0;
                         int num13 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
                         int num14 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
                         if ((double)num14 * 0.5 > 0.0)

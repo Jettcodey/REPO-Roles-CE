@@ -40,7 +40,7 @@ namespace R.E.P.O.Roles.patches
 
     	public int speedTicker = 0;
 
-    	public int manaTicks = 0;
+    	public static int manaTicks = 0;
 
     	public bool speedActive;
 
@@ -320,7 +320,7 @@ namespace R.E.P.O.Roles.patches
 
     		if (ManaHelper.val2 == null || ManaHelper.val2.GetComponent<ManaUI>() == null)
     		{
-    			RepoRoles.Logger.LogWarning("[Repo Roles] Mana UI missing or destroyed. Recreating...");
+    			RepoRoles.Logger.LogWarning("Mana UI missing or destroyed. Recreating...");
     			ManaHelper.CreateUI();
     		}
 

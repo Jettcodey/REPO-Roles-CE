@@ -76,6 +76,6 @@ namespace R.E.P.O.Roles.patches
 			// Add ManaUI
 			manaUI = val2.AddComponent<ManaUI>();
 			manaUI.SetMana(8f, 8f);
-		}
+        }
 	}
 }
