@@ -375,7 +375,7 @@ namespace R.E.P.O.Roles
 						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 1.2f);
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRL.Value;
 						RepoRoles.GUIinstance.color = new Color(0.592f, 0.969f, 0.663f);
-						RepoRoles.GUIinstance.descText = "You can reach objects from far away!\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRL.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.592f, 0.969f, 0.663f);
 						break;
 					}
