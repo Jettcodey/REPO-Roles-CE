@@ -53,7 +53,9 @@ namespace R.E.P.O.Roles
 
 		public static bool isScout;
 
-		private string[] roleNames = new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" };
+		public static bool isReviver;
+
+		private string[] roleNames = new string[12] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Reviver", "Regular" };
 
 		public ClassManager()
 		{
@@ -205,7 +207,7 @@ namespace R.E.P.O.Roles
 			{
 				return;
 			}
-			if (!RepoRoles.enableRunner.Value && !RepoRoles.enableTank.Value && !RepoRoles.enableGambler.Value && !RepoRoles.enableStrongman.Value && !RepoRoles.enableRL.Value && !RepoRoles.enableAthletic.Value && !RepoRoles.enableMage.Value && !RepoRoles.enableReaper.Value && !RepoRoles.enableScout.Value && !RepoRoles.enableRegular.Value)
+			if (!RepoRoles.enableRunner.Value && !RepoRoles.enableTank.Value && !RepoRoles.enableGambler.Value && !RepoRoles.enableStrongman.Value && !RepoRoles.enableRL.Value && !RepoRoles.enableAthletic.Value && !RepoRoles.enableMage.Value && !RepoRoles.enableReaper.Value && !RepoRoles.enableScout.Value && !RepoRoles.enableReviver.Value && !RepoRoles.enableRegular.Value)
 			{
 				RepoRoles.Logger.LogError((object)"WARNING! You disabled all roles in the config file. You will not get any roles until you change it back.");
 				return;
@@ -475,6 +477,30 @@ namespace R.E.P.O.Roles
 						break;
 					}
 				case 10:
+					{
+						if (!RepoRoles.enableReviver.Value)
+						{
+							assignRole(rnd.Next(1, roleAmount + 1), PlayerController.instance);
+							RepoRoles.Logger.LogInfo((object)"You got assigned a new random role because this one was disabled.");
+							break;
+						}
+						guiManager.ResetManaUI();
+						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
+						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameReviver.Value + "."));
+						isReviver = true;
+						__instance.CrouchSpeed = origCrouchSpeed;
+						__instance.MoveSpeed = origMoveSpeed;
+						__instance.SprintSpeed = origSprintSpeed + (float)num2 * 1f;
+						__instance.JumpForce = origJumpForce;
+						__instance.EnergyStart = origMaxEnergy + (float)num3 * 10f;
+						__instance.EnergyCurrent = origMaxEnergy + (float)num3 * 10f;
+						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameReviver.Value;
+						RepoRoles.GUIinstance.color = new Color(0.1f, 0.6f, 0.3f);
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecReviver.Value.Replace("[X]", "[" + ((object)RepoRoles.reviverKey.Value/*cast due to .constrained prefix*/).ToString() + "]") + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descColor = new Color(0.1f, 0.6f, 0.3f);
+						break;
+					}
+				case 11:
 					{
 						if (!RepoRoles.enableRegular.Value)
 						{

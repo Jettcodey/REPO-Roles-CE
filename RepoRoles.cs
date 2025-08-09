@@ -48,6 +48,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<KeyCode> scoutKey;
 
+		public static ConfigEntry<KeyCode> reviverKey;
+
 		public static ConfigEntry<string> customRoleNameRunner;
 
 		public static ConfigEntry<string> customRoleNameTank;
@@ -65,6 +67,8 @@ namespace Repo_Roles
 		public static ConfigEntry<string> customRoleNameReaper;
 
 		public static ConfigEntry<string> customRoleNameScout;
+
+		public static ConfigEntry<string> customRoleNameReviver;
 
 		public static ConfigEntry<string> customRoleNameRegular;
 
@@ -86,6 +90,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<string> customRoleDecScout;
 
+		public static ConfigEntry<string> customRoleDecReviver;
+
 		public static ConfigEntry<string> customRoleDecRegular;
 
 		public static ConfigEntry<string> savedRole;
@@ -104,6 +110,8 @@ namespace Repo_Roles
 
 		public ConfigDefinition scoutButtonDef = new ConfigDefinition("GUI", "Activate Scout Ability");
 
+		public ConfigDefinition reviverButtonDef = new ConfigDefinition("GUI", "Activate Reviver Ability");
+
 		public ConfigDefinition customRoleNameRunnerDef = new ConfigDefinition("Role Names", "Runner Name");
 
 		public ConfigDefinition customRoleNameTankDef = new ConfigDefinition("Role Names", "Tank Name");
@@ -121,6 +129,8 @@ namespace Repo_Roles
 		public ConfigDefinition customRoleNameReaperDef = new ConfigDefinition("Role Names", "Reaper Name");
 
 		public ConfigDefinition customRoleNameScoutDef = new ConfigDefinition("Role Names", "Scout Name");
+
+		public ConfigDefinition customRoleNameReviverDef = new ConfigDefinition("Role Names", "Reviver Name");
 
 		public ConfigDefinition customRoleNameRegularDef = new ConfigDefinition("Role Names", "Regular Name");
 
@@ -141,6 +151,8 @@ namespace Repo_Roles
 		public ConfigDefinition customRoleDesReaperDef = new ConfigDefinition("Role Descriptions", "Reaper Description");
 
 		public ConfigDefinition customRoleDesScoutDef = new ConfigDefinition("Role Descriptions", "Scout Description");
+
+		public ConfigDefinition customRoleDesReviverDef = new ConfigDefinition("Role Descriptions", "Reviver Description");
 
 		public ConfigDefinition customRoleDesRegularDef = new ConfigDefinition("Role Descriptions", "Regular Description");
 
@@ -178,6 +190,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<bool> enableScout;
 
+		public static ConfigEntry<bool> enableReviver;
+
 		public static ConfigEntry<bool> enableRegular;
 
 		public ConfigDefinition enableRunnerDef = new ConfigDefinition("Role", "Enable Runner");
@@ -197,6 +211,8 @@ namespace Repo_Roles
 		public ConfigDefinition enableReaperDef = new ConfigDefinition("Role", "Enable Reaper");
 
 		public ConfigDefinition enableScoutDef = new ConfigDefinition("Role", "Enable Scout");
+
+		public ConfigDefinition enableReviverDef = new ConfigDefinition("Role", "Enable Reviver");
 
 		public ConfigDefinition enableRegularDef = new ConfigDefinition("Role", "Enable Regular");
 
@@ -261,6 +277,7 @@ namespace Repo_Roles
 			enableMage = Config.Bind(enableMageDef, true, null);
 			enableReaper = Config.Bind(enableReaperDef, true, null);
 			enableScout = Config.Bind(enableScoutDef, true, null);
+			enableReviver = Config.Bind(enableReviverDef, true, null);
 			enableRegular = Config.Bind(enableRegularDef, true, null);
 			Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded successfully.");
 			MenuAPI.AddElementToSettingsMenu((BuilderDelegate)delegate (Transform parent)
@@ -280,7 +297,7 @@ namespace Repo_Roles
 						slider = MenuAPI.CreateREPOSlider("REPO Roles", "Choose your role", (Action<string>)delegate (string s)
 						{
 							sliderConf(s);
-						}, scrollView, new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
+						}, scrollView, new string[12] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Reviver", "Regular" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
 					}
 					return ((REPOElement)slider).rectTransform;
 				}, 0f, 0f);
@@ -352,6 +369,8 @@ namespace Repo_Roles
 			overchargeKey = Config.Bind(overchargeDef, (KeyCode)111, null);
 			jumpKey = Config.Bind(jumpDef, (KeyCode)107, null);
 			staminaKey = Config.Bind(staminaDef, (KeyCode)110, null);
+			scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
+			reviverKey = Config.Bind(reviverButtonDef, (KeyCode)120, null);
 			customRoleNameRunner = Config.Bind(customRoleNameRunnerDef, "Runner", null);
 			customRoleNameTank = Config.Bind(customRoleNameTankDef, "Tank", null);
 			customRoleNameGambler = Config.Bind(customRoleNameGamblerDef, "Gambler", null);
@@ -361,6 +380,7 @@ namespace Repo_Roles
 			customRoleNameMage = Config.Bind(customRoleNameMageDef, "Mage", null);
 			customRoleNameReaper = Config.Bind(customRoleNameReaperDef, "Reaper", null);
 			customRoleNameScout = Config.Bind(customRoleNameScoutDef, "Scout", null);
+			customRoleNameReviver = Config.Bind(customRoleNameReviverDef, "Reviver", null);
 			customRoleNameRegular = Config.Bind(customRoleNameRegularDef, "Regular", null);
 			customRoleDecRunner = Config.Bind(customRoleDesRunnerDef, "You have more stamina and run much faster than everyone else!", null);
 			customRoleDecTank = Config.Bind(customRoleDesTankDef, "You walk slower but your hp is doubled!", null);
@@ -371,11 +391,15 @@ namespace Repo_Roles
 			customRoleDecMage = Config.Bind(customRoleDesMageDef, "You are able to use your mana to become incredibly strong!", null);
 			customRoleDecReaper = Config.Bind(customRoleDesReaperDef, "For each enemy you and your friends kill, you become stronger!", null);
 			customRoleDecScout = Config.Bind(customRoleDesScoutDef, "Your stamina is more efficient and by pressing [G] you can see all enemies around you.", null);
+			customRoleDecReviver = Config.Bind(customRoleDesReviverDef, "You are able to Revive any Dead Semibot by pressing [X] while grabbing the semibots Head.", null);
 			customRoleDecRegular = Config.Bind(customRoleDesRegularDef, "You are just a regular Semibot. Nothing special.", null);
-			scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
+			
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
+			harmony.PatchAll(typeof(PlayerControllerPatch));
+			harmony.PatchAll(typeof(PhysGrabCartPatch));
+			harmony.PatchAll(typeof(ShopManagerPatch));
 			BundleLoader.LoadBundle(getPath(), delegate(AssetBundle assetBundle)
 			{
 				Item val = assetBundle.LoadAsset<Item>("Mana Regeneration Upgrade");
