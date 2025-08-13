@@ -8,27 +8,28 @@ namespace R.E.P.O.Roles
 	[HarmonyPatch(typeof(EnemyHealth))]
 	internal static class ReaperPatch
 	{
-		private static ReaperManager rMan;
-
 		[HarmonyPatch("Death")]
 		[HarmonyPrefix]
 		public static void PrefixMethod()
 		{
-			if ((Object)(object)((Component)SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID)).GetComponent<ReaperManager>() != null)
+			var avatar = SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID);
+			if (avatar == null) return;
+
+			var rMan = avatar.GetComponent<ReaperManager>();
+			if (rMan == null || !rMan.isReaper) return;
+
+			rMan.kills++;
+
+			if (SemiFunc.IsMultiplayer())
 			{
-				rMan = ((Component)SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID)).GetComponent<ReaperManager>();
+				if (rMan.photonView != null && rMan.photonView.IsMine && rMan.photonView.ViewID != 0)
+				{
+					rMan.photonView.RPC("giveReaperStatsRPC", RpcTarget.All, avatar.steamID);
+				}
 			}
 			else
 			{
-				RepoRoles.Logger.LogError((object)"Failed to get Reaper Manager! Please contact the mod developer about this.");
-			}
-			if (rMan.isReaper && (Object)(object)rMan != null)
-			{
-				rMan.kills++;
-			}
-			else
-			{
-				RepoRoles.Logger.LogError((object)"Unable to find ReaperManager in PlayerAvatar.instance. Please report this to the mod author.");
+				rMan.ApplyReaperStats(avatar);
 			}
 		}
 	}
