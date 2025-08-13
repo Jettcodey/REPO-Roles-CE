@@ -78,30 +78,30 @@ namespace R.E.P.O.Roles
 		{
 			string[] array = new string[5] { "You walk faster", "You have more stamina", "You have more health", "You\u00b4re stronger", "You jump higher" };
 			string[] array2 = new string[5] { "you walk slower", "you have less stamina", "you have less health", "you\u00b4re weaker", "you don\u00b4t jump as high" };
-			int num = genGamblerEffectNr();
-			int num2 = genGamblerEffectNr();
-			while (num == num2)
+			int posEffectNr = genGamblerEffectNr();
+			int negEffectNr = genGamblerEffectNr();
+			while (posEffectNr == negEffectNr)
 			{
-				num = genGamblerEffectNr();
-				num2 = genGamblerEffectNr();
+				posEffectNr = genGamblerEffectNr();
+				negEffectNr = genGamblerEffectNr();
 			}
-			string text = array[num];
-			string text2 = array2[num2];
+			string text = array[posEffectNr];
+			string text2 = array2[negEffectNr];
 			string text3 = RepoRoles.customRoleDecGambler.Value + " " + text + " but " + text2 + "!";
-			return new object[3] { text3, num, num2 };
+			return new object[3] { text3, posEffectNr, negEffectNr };
 		}
 
 		public void assignRoleFromConfig(PlayerController __instance)
 		{
-			string value = RepoRoles.savedRole.Value;
-			if (value == "" || value == "Random")
+			string roleChoice = RepoRoles.savedRole.Value;
+			if (roleChoice == "" || roleChoice == "Random")
 			{
 				chosenRoleId = rnd.Next(1, roleAmount + 1);
 				RepoRoles.Logger.LogInfo((object)"Rolling random role...");
 			}
 			else
 			{
-				chosenRoleId = Array.IndexOf<string>(roleNames, value);
+				chosenRoleId = Array.IndexOf<string>(roleNames, roleChoice);
 			}
 			assignRole(chosenRoleId, __instance);
 		}
@@ -153,49 +153,49 @@ namespace R.E.P.O.Roles
 			}
 			string text = SemiFunc.PlayerGetName(PlayerAvatar.instance);
 			string key = SemiFunc.PlayerGetSteamID(PlayerAvatar.instance);
-			int num = 0;
-			int num2 = 0;
-			int num3 = 0;
-			int num4 = 0;
-			int num5 = 0;
+			int numberOfHealthUpgrades = 0;
+			int numberOfSpeedUpgrades = 0;
+			int numberOfStaminaUpgrades = 0;
+			int numberOfStrengthUpgrades = 0;
+			int numberOfRangeUpgrades = 0;
 			if (StatsManager.instance.playerUpgradeHealth.TryGetValue(key, out var value))
 			{
-				num = value;
+				numberOfHealthUpgrades = value;
 			}
 			if (StatsManager.instance.playerUpgradeSpeed.TryGetValue(key, out var value2))
 			{
-				num2 = value2;
+				numberOfSpeedUpgrades = value2;
 			}
 			if (StatsManager.instance.playerUpgradeStamina.TryGetValue(key, out var value3))
 			{
-				num3 = value3;
+				numberOfStaminaUpgrades = value3;
 			}
 			if (StatsManager.instance.playerUpgradeStrength.TryGetValue(key, out var value4))
 			{
-				num4 = value4;
+				numberOfStrengthUpgrades = value4;
 			}
 			if (StatsManager.instance.playerUpgradeRange.TryGetValue(key, out var value5))
 			{
-				num5 = value5;
+				numberOfRangeUpgrades = value5;
 			}
 			stackKills = 0;
 			__instance.CrouchSpeed = origCrouchSpeed;
 			__instance.MoveSpeed = origMoveSpeed;
-			__instance.SprintSpeed = origSprintSpeed + (float)num2 * 1f;
+			__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1f;
 			__instance.JumpForce = origJumpForce;
-			__instance.EnergyStart = origMaxEnergy + (float)num3 * 10f;
-			__instance.EnergyCurrent = origMaxEnergy + (float)num3 * 10f;
-			PlayerAvatar.instance.physGrabber.grabRange = origGrabRange + 1f * (float)num5;
-			modifyStrength(PlayerController.instance.playerSteamID, origGrabStrength + (float)num4 * 0.2f);
-			int num6 = origMaxPlayerHealth + num * 20;
+			__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
+			__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
+			PlayerAvatar.instance.physGrabber.grabRange = origGrabRange + 1f * (float)numberOfRangeUpgrades;
+			modifyStrength(PlayerController.instance.playerSteamID, origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f);
+			int maxOrigHP = origMaxPlayerHealth + numberOfHealthUpgrades * 20;
 			int health = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-			if ((int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth) > num6)
+			if ((int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth) > maxOrigHP)
 			{
-				setHealth(PlayerController.instance.playerSteamID, num6, num6);
+				setHealth(PlayerController.instance.playerSteamID, maxOrigHP, maxOrigHP);
 			}
 			else
 			{
-				setHealth(PlayerController.instance.playerSteamID, num6, health);
+				setHealth(PlayerController.instance.playerSteamID, maxOrigHP, health);
 			}
 			guiManager.isMage = false;
 			isTank = false;
@@ -239,9 +239,9 @@ namespace R.E.P.O.Roles
 						RepoRoles.Logger.LogInfo((object)("Assigning role " + RepoRoles.customRoleNameRunner.Value + "."));
 						__instance.CrouchSpeed = origCrouchSpeed * speedMultiplier;
 						__instance.MoveSpeed = origMoveSpeed * speedMultiplier;
-						__instance.SprintSpeed = origSprintSpeed * speedMultiplier + (float)num2 * 1f;
-						__instance.EnergyStart = (origMaxEnergy + (float)num3 * 10f) * 1.2f;
-						__instance.EnergyCurrent = (origMaxEnergy + (float)num3 * 10f) * 1.2f;
+						__instance.SprintSpeed = origSprintSpeed * speedMultiplier + (float)numberOfSpeedUpgrades * 1f;
+						__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.2f;
+						__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.2f;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRunner.Value;
 						RepoRoles.GUIinstance.color = new Color(0.973f, 1f, 0.196f);
 						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRunner.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
@@ -264,7 +264,7 @@ namespace R.E.P.O.Roles
 						setHealth(PlayerController.instance.playerSteamID, num15 * 2, num16 * 2);
 						__instance.CrouchSpeed = origCrouchSpeed * 0.9f;
 						__instance.MoveSpeed = origMoveSpeed * 0.9f;
-						__instance.SprintSpeed = (origSprintSpeed + (float)num2 * 1f) * 0.9f;
+						__instance.SprintSpeed = (origSprintSpeed + (float)numberOfSpeedUpgrades * 1f) * 0.9f;
 						isTank = true;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameTank.Value;
 						RepoRoles.GUIinstance.color = Color.gray;
@@ -288,12 +288,12 @@ namespace R.E.P.O.Roles
 						{
 							__instance.CrouchSpeed = origCrouchSpeed * 1.3f;
 							__instance.MoveSpeed = origMoveSpeed * 1.3f;
-							__instance.SprintSpeed = origSprintSpeed + (float)num2 * 1.3f;
+							__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1.3f;
 						}
 						else if ((int)array[1] == 1)
 						{
-							__instance.EnergyStart = (origMaxEnergy + (float)num3 * 10f) * 1.8f;
-							__instance.EnergyCurrent = (origMaxEnergy + (float)num3 * 10f) * 1.8f;
+							__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.8f;
+							__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.8f;
 						}
 						else if ((int)array[1] == 2)
 						{
@@ -303,7 +303,7 @@ namespace R.E.P.O.Roles
 						}
 						else if ((int)array[1] == 3)
 						{
-							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 1.3f);
+							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.3f);
 						}
 						else if ((int)array[1] == 4)
 						{
@@ -313,12 +313,12 @@ namespace R.E.P.O.Roles
 						{
 							__instance.CrouchSpeed = origCrouchSpeed;
 							__instance.MoveSpeed = origMoveSpeed;
-							__instance.SprintSpeed = origSprintSpeed + (float)num2 * 0.8f;
+							__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 0.8f;
 						}
 						else if ((int)array[2] == 1)
 						{
-							__instance.EnergyStart = (origMaxEnergy + (float)num3 * 10f) * 0.8f;
-							__instance.EnergyCurrent = (origMaxEnergy + (float)num3 * 10f) * 0.8f;
+							__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 0.8f;
+							__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 0.8f;
 						}
 						else if ((int)array[2] == 2)
 						{
@@ -328,7 +328,7 @@ namespace R.E.P.O.Roles
 						}
 						else if ((int)array[2] == 3)
 						{
-							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 0.8f);
+							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 0.8f);
 						}
 						else if ((int)array[2] == 4)
 						{
@@ -352,7 +352,7 @@ namespace R.E.P.O.Roles
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameStrongman.Value + "."));
 						RepoRoles.Logger.LogInfo((object)("Strength before: " + PhysGrabber.instance.grabStrength));
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 1.5f + 0.5f);
+						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.5f + 0.5f);
 						RepoRoles.Logger.LogInfo((object)("Strength after: " + PhysGrabber.instance.grabStrength));
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameStrongman.Value;
 						RepoRoles.GUIinstance.color = new Color(0.761f, 0.055f, 0.055f);
@@ -371,8 +371,8 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameRL.Value + "."));
-						PhysGrabber.instance.grabRange = (origGrabRange + (float)num5 * 1f) * 2.5f;
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 1.2f);
+						PhysGrabber.instance.grabRange = (origGrabRange + (float)numberOfRangeUpgrades * 1f) * 2.5f;
+						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.2f);
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRL.Value;
 						RepoRoles.GUIinstance.color = new Color(0.592f, 0.969f, 0.663f);
 						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRL.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
@@ -390,9 +390,9 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameAthletic.Value + "."));
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)num4 * 0.2f) * 1.3f);
-						__instance.EnergyStart = origMaxEnergy + (float)num3 * 10f + 20f;
-						__instance.EnergyCurrent = origMaxEnergy + (float)num3 * 10f + 20f;
+						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.3f);
+						__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f + 20f;
+						__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f + 20f;
 						__instance.JumpForce = origJumpForce + 3f;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameAthletic.Value;
 						RepoRoles.GUIinstance.color = Color.white;
@@ -465,8 +465,8 @@ namespace R.E.P.O.Roles
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameScout.Value + "."));
 						isScout = true;
-						__instance.EnergyStart = (origMaxEnergy + (float)num3 * 10f) * 2f;
-						__instance.EnergyCurrent = (origMaxEnergy + (float)num3 * 10f) * 2f;
+						__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 2f;
+						__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 2f;
 						__instance.sprintRechargeAmount *= 2f;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameScout.Value;
 						RepoRoles.GUIinstance.color = new Color(0.902f, 0.733f, 0.11f);
@@ -487,10 +487,10 @@ namespace R.E.P.O.Roles
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameRegular.Value + "."));
 						__instance.CrouchSpeed = origCrouchSpeed;
 						__instance.MoveSpeed = origMoveSpeed;
-						__instance.SprintSpeed = origSprintSpeed + (float)num2 * 1f;
+						__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1f;
 						__instance.JumpForce = origJumpForce;
-						__instance.EnergyStart = origMaxEnergy + (float)num3 * 10f;
-						__instance.EnergyCurrent = origMaxEnergy + (float)num3 * 10f;
+						__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
+						__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRegular.Value;
 						RepoRoles.GUIinstance.color = Color.white;
 						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRegular.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
