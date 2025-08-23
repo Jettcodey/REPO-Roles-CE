@@ -490,10 +490,10 @@ namespace R.E.P.O.Roles
 						isReviver = true;
 						__instance.CrouchSpeed = origCrouchSpeed;
 						__instance.MoveSpeed = origMoveSpeed;
-						__instance.SprintSpeed = origSprintSpeed + (float)num2 * 1f;
+						__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1f;
 						__instance.JumpForce = origJumpForce;
-						__instance.EnergyStart = origMaxEnergy + (float)num3 * 10f;
-						__instance.EnergyCurrent = origMaxEnergy + (float)num3 * 10f;
+						__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
+						__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameReviver.Value;
 						RepoRoles.GUIinstance.color = new Color(0.1f, 0.6f, 0.3f);
 						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecReviver.Value.Replace("[X]", "[" + ((object)RepoRoles.reviverKey.Value/*cast due to .constrained prefix*/).ToString() + "]") + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
