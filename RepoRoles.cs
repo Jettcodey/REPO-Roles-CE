@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.1.2")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.1.3")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("MenuLib", BepInDependency.DependencyFlags.SoftDependency)]
 	public class RepoRoles : BaseUnityPlugin
@@ -262,7 +262,6 @@ namespace Repo_Roles
 			enableReaper = Config.Bind(enableReaperDef, true, null);
 			enableScout = Config.Bind(enableScoutDef, true, null);
 			enableRegular = Config.Bind(enableRegularDef, true, null);
-			Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded successfully.");
 			MenuAPI.AddElementToSettingsMenu((BuilderDelegate)delegate (Transform parent)
 			{
 				if ((UnityEngine.Object)(object)configPage == null)
@@ -333,7 +332,7 @@ namespace Repo_Roles
 			}
 			harmony.PatchAll(typeof(RepoRoles));
 			harmony.PatchAll(typeof(Sender));
-			Logger.LogInfo("Init mod");
+			Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded successfully.");
 			SceneManager.sceneLoaded += delegate
 			{
 				if (GUIinstance == null)
