@@ -1,4 +1,5 @@
 using HarmonyLib;
+using R.E.P.O.Roles;
 using R.E.P.O.Roles.patches;
 using Unity.VisualScripting;
 using UnityEngine;

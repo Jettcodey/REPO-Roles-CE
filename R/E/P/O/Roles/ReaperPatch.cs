@@ -22,10 +22,7 @@ namespace R.E.P.O.Roles
 
 			if (SemiFunc.IsMultiplayer())
 			{
-				if (rMan.photonView != null && rMan.photonView.IsMine && rMan.photonView.ViewID != 0)
-				{
-					rMan.photonView.RPC("giveReaperStatsRPC", RpcTarget.All, avatar.steamID);
-				}
+				rMan.SendRPC("giveReaperStatsRPC", RpcTarget.All, avatar.steamID);
 			}
 			else
 			{
