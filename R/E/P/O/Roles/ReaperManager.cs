@@ -45,6 +45,25 @@ namespace R.E.P.O.Roles
 			}
 		}
 
+		internal void SendRPC(string methodName, RpcTarget target, params object[] parameters)
+		{
+			if (RunManager.instance == null || RunManager.instance.levelCurrent == null)
+				return;
+
+			bool isRunLevel = RunManager.instance.levels.Contains(RunManager.instance.levelCurrent);
+			if (!isRunLevel)
+				return;
+
+			if (photonView != null && photonView.IsMine && photonView.ViewID != 0)
+			{
+				photonView.RPC(methodName, target, parameters);
+			}
+			else
+			{
+				RepoRoles.Logger.LogWarning($"ReaperManager.SendRPC: photonView ({photonView.ViewID}) is null or not mine or ViewID is 0, cannot send {methodName} RPC");
+			}
+		}
+
 		internal void ApplyReaperStats(PlayerAvatar avatar)
 		{
 			var ph = avatar.playerHealth;

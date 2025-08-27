@@ -135,7 +135,14 @@ namespace R.E.P.O.Roles
 			}
 			else if ((UnityEngine.Object)(object)PlayerAvatar.instance.photonView != null)
 			{
-				PlayerAvatar.instance.photonView.RPC("setReaperStatusRPC", (RpcTarget)0, new object[2] { steamID, isReaper });
+				// Skip if not in a RunLevel
+				if (RunManager.instance == null || RunManager.instance.levelCurrent == null)
+					return;
+
+				if (!RunManager.instance.levels.Contains(RunManager.instance.levelCurrent))
+					return;
+
+				PlayerAvatar.instance.photonView.RPC("setReaperStatusRPC", RpcTarget.All, steamID, isReaper);
 			}
 		}
 
