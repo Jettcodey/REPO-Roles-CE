@@ -1,6 +1,5 @@
 using HarmonyLib;
 using Repo_Roles;
-using Photon.Pun;
 using UnityEngine;
 
 namespace R.E.P.O.Roles
@@ -12,21 +11,26 @@ namespace R.E.P.O.Roles
 		[HarmonyPrefix]
 		public static void PrefixMethod()
 		{
-			var avatar = SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID);
-			if (avatar == null) return;
+			var killerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(PlayerController.instance.playerSteamID);
+			if (killerAvatar == null) return;
 
-			var rMan = avatar.GetComponent<ReaperManager>();
-			if (rMan == null || !rMan.isReaper) return;
-
-			rMan.kills++;
-
-			if (SemiFunc.IsMultiplayer())
+			var killerRM = killerAvatar.GetComponent<ReaperManager>();
+			if (killerRM != null)
 			{
-				rMan.SendRPC("giveReaperStatsRPC", RpcTarget.All, avatar.steamID);
+				killerRM.kills++;
+			}
+
+			// Call OnEnemyKilled on the local player's ReaperManager (handles client->master request or master broadcast)
+			if (killerRM != null)
+			{
+				killerRM.OnEnemyKilled(killerAvatar);
 			}
 			else
 			{
-				rMan.ApplyReaperStats(avatar);
+				ReaperEvents.RaiseRequestApplyBuffs(killerAvatar.steamID);
+#if DEBUG
+				RepoRoles.Logger.LogWarning((object)$"[RpPch] PrefixMethod: killer had no ReaperManager, sent request for killer={killerAvatar.steamID}");
+#endif
 			}
 		}
 	}
