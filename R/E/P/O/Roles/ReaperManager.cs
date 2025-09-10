@@ -5,80 +5,113 @@ using UnityEngine;
 
 namespace R.E.P.O.Roles
 {
-	public class ReaperManager : MonoBehaviour
+	public class ReaperManager : MonoBehaviourPun
 	{
 		public bool isReaper;
 		public int kills;
-		public PhotonView photonView;
+		public int enemyDeathTimer = 0;
 
 		private void Start()
 		{
-			photonView = GetComponent<PhotonView>();
+			ReaperEventListener.Ensure();
 		}
 
 		private void OnDestroy()
 		{
-			if (photonView != null && photonView.IsMine && photonView.ViewID != 0)
+			try
 			{
-				PhotonNetwork.RemoveRPCs(photonView);
+				if (photonView != null && photonView.IsMine && photonView.ViewID != 0)
+				{
+					PhotonNetwork.RemoveRPCs(photonView);
+				}
 			}
-			photonView = null;
-		}
-
-		[PunRPC]
-		internal void setReaperStatusRPC(string steamID, bool isReaper)
-		{
-			var avatar = SemiFunc.PlayerAvatarGetFromSteamID(steamID);
-			if (avatar != null)
+			catch (System.Exception ex)
 			{
-				avatar.GetComponent<ReaperManager>().isReaper = isReaper;
+				RepoRoles.Logger.LogWarning((object)$"[RpMr] OnDestroy: RemoveRPCs exception: {ex}");
 			}
 		}
 
 		[PunRPC]
-		internal void giveReaperStatsRPC(string steamID)
-		{
-			var avatar = SemiFunc.PlayerAvatarGetFromSteamID(steamID);
-			if (avatar != null)
-			{
-				ApplyReaperStats(avatar);
-			}
-		}
-
-		internal void SendRPC(string methodName, RpcTarget target, params object[] parameters)
+		public void setReaperStatusRPC(string steamID, bool isReaper)
 		{
 			if (RunManager.instance == null || RunManager.instance.levelCurrent == null)
-				return;
-
-			bool isRunLevel = RunManager.instance.levels.Contains(RunManager.instance.levelCurrent);
-			if (!isRunLevel)
-				return;
-
-			if (photonView != null && photonView.IsMine && photonView.ViewID != 0)
 			{
-				photonView.RPC(methodName, target, parameters);
+				RepoRoles.Logger.LogWarning((object)$"[RpMr] setReaperStatusRPC: RunManager/level null - ignoring for {steamID}");
+				return;
+			}
+			if (!RunManager.instance.levels.Contains(RunManager.instance.levelCurrent))
+			{
+				RepoRoles.Logger.LogInfo((object)$"[RpMr] setReaperStatusRPC: not a runlevel - ignoring for {steamID}");
+				return;
+			}
+
+			var avatar = SemiFunc.PlayerAvatarGetFromSteamID(steamID);
+			if (avatar != null)
+			{
+				var rm = avatar.GetComponent<ReaperManager>();
+				if (rm != null)
+				{
+					if (rm.isReaper != isReaper)
+					{
+						RepoRoles.Logger.LogInfo((object)$"[RpMr] setReaperStatusRPC: received for {steamID}, setTo={isReaper}");
+						rm.isReaper = isReaper;
+#if DEBUG
+						RepoRoles.Logger.LogInfo((object)$"[RpMr] setReaperStatusRPC: Applied isReaper={isReaper} to avatar steamID={steamID}");
+#endif
+					}
+				}
+			}
+
+			if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
+			{
+				ReaperEvents.RaiseReaperStatusChange(steamID, isReaper);
 			}
 			else
 			{
-				RepoRoles.Logger.LogWarning($"ReaperManager.SendRPC: photonView ({photonView.ViewID}) is null or not mine or ViewID is 0, cannot send {methodName} RPC");
+				RepoRoles.Logger.LogWarning((object)$"[RpMr] setReaperStatusRPC: Not in room/connected - not notifying master for {steamID}");
 			}
+		}
+
+		public void OnEnemyKilled(PlayerAvatar killerAvatar)
+		{
+			if (killerAvatar == null) return;
+			string killerSteam = killerAvatar.steamID;
+
+			if (PhotonNetwork.IsMasterClient)
+			{
+				var reapers = ReaperEventListener.GetMasterReapers();
+				RepoRoles.Logger.LogInfo((object)$"[RpMr] Master local kill: broadcasting buffs for {reapers.Length} reapers (killer={killerSteam})");
+				if (reapers.Length > 0)
+					ReaperEvents.RaiseApplyBuffs(killerSteam, reapers);
+				return;
+			}
+
+			ReaperEvents.RaiseRequestApplyBuffs(killerSteam);
+#if DEBUG
+			RepoRoles.Logger.LogInfo((object)$"[RpMr] Client requested master to apply buffs for killer={killerSteam}");
+#endif
 		}
 
 		internal void ApplyReaperStats(PlayerAvatar avatar)
 		{
-			var ph = avatar.playerHealth;
-			int maxHealth = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(ph) + 5;
-			AccessTools.Field(typeof(PlayerHealth), "maxHealth").SetValue(ph, maxHealth);
+			if (avatar == null) return;
+			int health = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(avatar.playerHealth);
+			int maxHealthBefore = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(avatar.playerHealth);
+			int maxHealth = maxHealthBefore + 5;
+			AccessTools.Field(typeof(PlayerHealth), "maxHealth").SetValue(avatar.playerHealth, maxHealth);
 
-			int health = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(ph);
 			if (health + 30 > maxHealth)
-			{
 				avatar.playerHealth.Heal(maxHealth - health);
-			}
 			else
-			{
 				avatar.playerHealth.Heal(30);
-			}
+#if DEBUG
+			RepoRoles.Logger.LogInfo((object)$"[RpMr] ApplyReaperStats: applied local buff to {avatar.steamID} (health {health} -> {(int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(avatar.playerHealth)}, max {maxHealthBefore} -> {maxHealth})");
+#endif
+		}
+
+		private void Update()
+		{
+			if (enemyDeathTimer > 0) enemyDeathTimer--;
 		}
 	}
 }

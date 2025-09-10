@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.1.3")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.1.4")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("MenuLib", BepInDependency.DependencyFlags.SoftDependency)]
 	public class RepoRoles : BaseUnityPlugin
@@ -375,6 +375,7 @@ namespace Repo_Roles
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
+			harmony.PatchAll(typeof(EnemyHealthPatch));
 			BundleLoader.LoadBundle(getPath(), delegate(AssetBundle assetBundle)
 			{
 				Item val = assetBundle.LoadAsset<Item>("Mana Regeneration Upgrade");
