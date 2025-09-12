@@ -399,6 +399,7 @@ namespace Repo_Roles
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
+			harmony.PatchAll(typeof(EnemyHealthPatch));
 			BundleLoader.LoadBundle(getPath(), delegate(AssetBundle assetBundle)
 			{
 				Item val = assetBundle.LoadAsset<Item>("Mana Regeneration Upgrade");
