@@ -393,7 +393,9 @@ namespace Repo_Roles
 			customRoleDecScout = Config.Bind(customRoleDesScoutDef, "Your stamina is more efficient and by pressing [G] you can see all enemies around you.", null);
 			customRoleDecReviver = Config.Bind(customRoleDesReviverDef, "You are able to Revive any Dead Semibot by pressing [X] while grabbing the semibots Head.", null);
 			customRoleDecRegular = Config.Bind(customRoleDesRegularDef, "You are just a regular Semibot. Nothing special.", null);
-			
+			harmony.PatchAll(typeof(PlayerControllerPatch));
+			harmony.PatchAll(typeof(PhysGrabCartPatch));
+			harmony.PatchAll(typeof(ShopManagerPatch));
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
