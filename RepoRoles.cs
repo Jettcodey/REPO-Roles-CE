@@ -15,10 +15,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static MenuLib.MenuAPI;
 using static MenuLib.MonoBehaviors.REPOSlider;
+using REPOLib.Objects.Sdk;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.1.4")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.0")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("MenuLib", BepInDependency.DependencyFlags.SoftDependency)]
 	public class RepoRoles : BaseUnityPlugin
@@ -376,12 +377,72 @@ namespace Repo_Roles
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
 			harmony.PatchAll(typeof(EnemyHealthPatch));
-			BundleLoader.LoadBundle(getPath(), delegate(AssetBundle assetBundle)
+			BundleLoader.LoadBundle(getPath(), delegate (AssetBundle assetBundle)
 			{
-				Item val = assetBundle.LoadAsset<Item>("Mana Regeneration Upgrade");
-				Items.RegisterItem(val);
-				Item val2 = assetBundle.LoadAsset<Item>("Scout Cooldown Upgrade");
-				Items.RegisterItem(val2);
+				string[] upgrades = new[] { "Mana Regeneration Upgrade", "Scout Cooldown Upgrade" };
+
+				foreach (var upgradeName in upgrades)
+				{
+					try
+					{
+						Item item = assetBundle.LoadAsset<Item>(upgradeName);
+						if (item == null)
+						{
+							Logger.LogError($"Failed loading Item asset '{upgradeName}' from bundle.");
+							continue;
+						}
+
+						// load prefabs
+						GameObject prefab = assetBundle.LoadAsset<GameObject>(upgradeName);
+
+						if (prefab == null)
+						{
+							Logger.LogError($"Failed loading prefab for upgrade '{upgradeName}'. Make sure the prefab is included in the bundle.");
+							continue;
+						}
+
+						// unique name
+						string assetName = $"REPORoles_upgrade {upgradeName}";
+						prefab.name = assetName;
+						item.name = assetName;
+						item.itemName = $"{upgradeName}";
+
+						// Add Value if missing (dont remember)
+						if (item.value == null)
+						{
+							Value v = ScriptableObject.CreateInstance<Value>();
+							v.valueMin = 100f;
+							v.valueMax = 100f;
+							item.value = v;
+						}
+
+						// hook
+						ItemAttributes itemAttributes = prefab.GetComponent<ItemAttributes>() ?? prefab.AddComponent<ItemAttributes>();
+						itemAttributes.item = item;
+
+						// Add or reuse the REPOLib upgrade component and set its private id
+						REPOLibItemUpgrade itemUpgrade = prefab.GetComponent<REPOLibItemUpgrade>() ?? prefab.AddComponent<REPOLibItemUpgrade>();
+						AccessTools.Field(typeof(REPOLibItemUpgrade), "_upgradeId").SetValue(itemUpgrade, upgradeName);
+
+						// Register the prefab/item with REPOLib
+						var prefabRef = Items.RegisterItem(itemAttributes);
+						if (prefabRef == null)
+						{
+							Logger.LogWarning($"Items.RegisterItem returned null for '{upgradeName}'. It may already be registered or there was an error.");
+						}
+						else
+						{
+							Logger.LogInfo($"Registered upgrade item '{upgradeName}'.");
+						}
+
+						// Register the upgrades with REPOLib
+						Upgrades.RegisterUpgrade(upgradeName, item, null, null);
+					}
+					catch (System.Exception e)
+					{
+						Logger.LogError($"Exception while registering upgrade '{upgradeName}': {e}");
+					}
+				}
 			}, false);
 		}
 

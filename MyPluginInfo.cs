@@ -10,6 +10,6 @@ namespace Repo_Roles
 
 		public const string PLUGIN_NAME = "REPO Roles Classic";
 
-		public const string PLUGIN_VERSION = "2.1.4";
+		public const string PLUGIN_VERSION = "2.2.0";
 	}
 }

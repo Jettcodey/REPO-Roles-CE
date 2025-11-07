@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Repo_Roles;
+using REPOLib.Modules;
 using UnityEngine;
 
 namespace R.E.P.O.Roles.patches
