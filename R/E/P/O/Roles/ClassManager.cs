@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using BepInEx.Logging;
 using HarmonyLib;
 using Photon.Pun;
@@ -27,26 +27,6 @@ namespace R.E.P.O.Roles
 
 		public readonly Harmony harmonyPatcher = new Harmony("patches.reporoles.mod");
 
-		private float origMoveSpeed;
-
-		private float origSprintSpeed;
-
-		private float origCrouchSpeed;
-
-		private float speedMultiplier;
-
-		private int origPlayerHealth;
-
-		private int origMaxPlayerHealth;
-
-		private float origJumpForce;
-
-		private float origMaxEnergy;
-
-		private float origGrabStrength;
-
-		private float origGrabRange;
-
 		public static int stackKills;
 
 		public static bool isTank;
@@ -57,16 +37,7 @@ namespace R.E.P.O.Roles
 
 		public ClassManager()
 		{
-			origMoveSpeed = PlayerController.instance.MoveSpeed;
-			origSprintSpeed = PlayerController.instance.SprintSpeed;
-			origCrouchSpeed = PlayerController.instance.CrouchSpeed;
-			speedMultiplier = 1.5f;
-			origJumpForce = PlayerController.instance.JumpForce;
-			origPlayerHealth = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-			origMaxPlayerHealth = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-			origMaxEnergy = PlayerController.instance.EnergyStart;
-			origGrabStrength = PhysGrabber.instance.grabStrength;
-			origGrabRange = PhysGrabber.instance.grabRange;
+			// The constructor is now empty - we do not save the original values
 		}
 
 		public int genGamblerEffectNr()
@@ -142,7 +113,7 @@ namespace R.E.P.O.Roles
 				if (PlayerAvatar.instance != null && PlayerAvatar.instance.photonView != null)
 				{
 					PlayerAvatar.instance.photonView.RPC("setReaperStatusRPC", RpcTarget.All, steamID, isReaper);
-#if DEBUG			
+#if DEBUG
 					RepoRoles.Logger.LogInfo((object)$"[CsMr] setReaperStatus: sent RPC for {steamID}, setTo={isReaper}");
 #endif
 				}
@@ -153,6 +124,18 @@ namespace R.E.P.O.Roles
 		{
 			RepoRoles.Update_ManaRegeneration();
 			RepoRoles.Update_ScoutCooldown();
+
+			float currentMoveSpeed = __instance.MoveSpeed;
+			float currentSprintSpeed = __instance.SprintSpeed;
+			float currentCrouchSpeed = __instance.CrouchSpeed;
+			float currentJumpForce = __instance.JumpForce;
+			float currentMaxEnergy = __instance.EnergyStart;
+			float currentEnergy = __instance.EnergyCurrent;
+			float currentGrabStrength = PlayerAvatar.instance.physGrabber.grabStrength;
+			float currentGrabRange = PlayerAvatar.instance.physGrabber.grabRange;
+			int currentMaxHealth = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
+			int currentHealth = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
+
 			if ((UnityEngine.Object)(object)((Component)PlayerAvatar.instance).GetComponent<ReaperManager>() != null)
 			{
 				rMan = ((Component)PlayerAvatar.instance).GetComponent<ReaperManager>();
@@ -161,65 +144,28 @@ namespace R.E.P.O.Roles
 			{
 				RepoRoles.Logger.LogError((object)"Failed to get Reaper Manager! Please contact the mod developer about this.");
 			}
+
 			string text = SemiFunc.PlayerGetName(PlayerAvatar.instance);
 			string key = SemiFunc.PlayerGetSteamID(PlayerAvatar.instance);
-			int numberOfHealthUpgrades = 0;
-			int numberOfSpeedUpgrades = 0;
-			int numberOfStaminaUpgrades = 0;
-			int numberOfStrengthUpgrades = 0;
-			int numberOfRangeUpgrades = 0;
-			if (StatsManager.instance.playerUpgradeHealth.TryGetValue(key, out var value))
-			{
-				numberOfHealthUpgrades = value;
-			}
-			if (StatsManager.instance.playerUpgradeSpeed.TryGetValue(key, out var value2))
-			{
-				numberOfSpeedUpgrades = value2;
-			}
-			if (StatsManager.instance.playerUpgradeStamina.TryGetValue(key, out var value3))
-			{
-				numberOfStaminaUpgrades = value3;
-			}
-			if (StatsManager.instance.playerUpgradeStrength.TryGetValue(key, out var value4))
-			{
-				numberOfStrengthUpgrades = value4;
-			}
-			if (StatsManager.instance.playerUpgradeRange.TryGetValue(key, out var value5))
-			{
-				numberOfRangeUpgrades = value5;
-			}
+
 			stackKills = 0;
-			__instance.CrouchSpeed = origCrouchSpeed;
-			__instance.MoveSpeed = origMoveSpeed;
-			__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1f;
-			__instance.JumpForce = origJumpForce;
-			__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
-			__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
-			PlayerAvatar.instance.physGrabber.grabRange = origGrabRange + 1f * (float)numberOfRangeUpgrades;
-			modifyStrength(PlayerController.instance.playerSteamID, origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f);
-			int maxOrigHP = origMaxPlayerHealth + numberOfHealthUpgrades * 20;
-			int health = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-			if ((int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth) > maxOrigHP)
-			{
-				setHealth(PlayerController.instance.playerSteamID, maxOrigHP, maxOrigHP);
-			}
-			else
-			{
-				setHealth(PlayerController.instance.playerSteamID, maxOrigHP, health);
-			}
+
 			guiManager.isMage = false;
 			isTank = false;
 			setReaperStatus(PlayerController.instance.playerSteamID, isReaper: false);
 			isScout = false;
+
 			if (!SemiFunc.RunIsLevel() || SemiFunc.RunIsShop())
 			{
 				return;
 			}
+
 			if (!RepoRoles.enableRunner.Value && !RepoRoles.enableTank.Value && !RepoRoles.enableGambler.Value && !RepoRoles.enableStrongman.Value && !RepoRoles.enableRL.Value && !RepoRoles.enableAthletic.Value && !RepoRoles.enableMage.Value && !RepoRoles.enableReaper.Value && !RepoRoles.enableScout.Value && !RepoRoles.enableRegular.Value)
 			{
 				RepoRoles.Logger.LogError((object)"WARNING! You disabled all roles in the config file. You will not get any roles until you change it back.");
 				return;
 			}
+
 			if (RepoRoles.showGUIAtStart.Value)
 			{
 				guiManager.showGUI = true;
@@ -228,15 +174,18 @@ namespace R.E.P.O.Roles
 			{
 				guiManager.showGUI = false;
 			}
+
 			harmonyPatcher.PatchAll(typeof(PunManagerPatch));
+
 			if (roleId <= 0)
 			{
 				RepoRoles.Logger.LogWarning((object)"Unable to find RoleId! Please contact the mod developer.");
 				return;
 			}
+
 			switch (roleId)
 			{
-				case 1:
+				case 1: // Runner
 					{
 						if (!RepoRoles.enableRunner.Value)
 						{
@@ -247,18 +196,20 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogInfo((object)("Assigning role " + RepoRoles.customRoleNameRunner.Value + "."));
-						__instance.CrouchSpeed = origCrouchSpeed * speedMultiplier;
-						__instance.MoveSpeed = origMoveSpeed * speedMultiplier;
-						__instance.SprintSpeed = origSprintSpeed * speedMultiplier + (float)numberOfSpeedUpgrades * 1f;
-						__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.2f;
-						__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.2f;
+
+						__instance.CrouchSpeed = currentCrouchSpeed * 1.5f;
+						__instance.MoveSpeed = currentMoveSpeed * 1.5f;
+						__instance.SprintSpeed = currentSprintSpeed * 1.5f;
+						__instance.EnergyStart = currentMaxEnergy * 1.5f;
+						__instance.EnergyCurrent = currentEnergy * 1.5f;
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRunner.Value;
 						RepoRoles.GUIinstance.color = new Color(0.973f, 1f, 0.196f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRunner.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRunner.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.973f, 1f, 0.196f);
 						break;
 					}
-				case 2:
+				case 2: // Tank
 					{
 						if (!RepoRoles.enableTank.Value)
 						{
@@ -269,20 +220,20 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogInfo((object)("Assigning role " + RepoRoles.customRoleNameTank.Value + "."));
-						int num15 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-						int num16 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-						setHealth(PlayerController.instance.playerSteamID, num15 * 2, num16 * 2);
-						__instance.CrouchSpeed = origCrouchSpeed * 0.9f;
-						__instance.MoveSpeed = origMoveSpeed * 0.9f;
-						__instance.SprintSpeed = (origSprintSpeed + (float)numberOfSpeedUpgrades * 1f) * 0.9f;
+
+						setHealth(PlayerController.instance.playerSteamID, currentMaxHealth * 2, currentHealth * 2);
+						__instance.CrouchSpeed = currentCrouchSpeed * 0.9f;
+						__instance.MoveSpeed = currentMoveSpeed * 0.9f;
+						__instance.SprintSpeed = currentSprintSpeed * 0.9f;
 						isTank = true;
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameTank.Value;
 						RepoRoles.GUIinstance.color = Color.gray;
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecTank.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecTank.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = Color.gray;
 						break;
 					}
-				case 3:
+				case 3: // Gambler
 					{
 						if (!RepoRoles.enableGambler.Value)
 						{
@@ -293,64 +244,64 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogInfo((object)("Assigning role " + RepoRoles.customRoleNameGambler.Value + "."));
+
 						object[] array = genGamblerEffects();
+
 						if ((int)array[1] == 0)
 						{
-							__instance.CrouchSpeed = origCrouchSpeed * 1.3f;
-							__instance.MoveSpeed = origMoveSpeed * 1.3f;
-							__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1.3f;
+							__instance.CrouchSpeed = currentCrouchSpeed * 1.3f;
+							__instance.MoveSpeed = currentMoveSpeed * 1.3f;
+							__instance.SprintSpeed = currentSprintSpeed * 1.3f;
 						}
 						else if ((int)array[1] == 1)
 						{
-							__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.8f;
-							__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 1.8f;
+							__instance.EnergyStart = currentMaxEnergy * 1.8f;
+							__instance.EnergyCurrent = currentEnergy * 1.8f;
 						}
 						else if ((int)array[1] == 2)
 						{
-							int num7 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-							int num8 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-							setHealth(PlayerController.instance.playerSteamID, (int)((double)num7 * 1.8), (int)((double)num8 * 1.8));
+							setHealth(PlayerController.instance.playerSteamID, (int)(currentMaxHealth * 1.8), (int)(currentHealth * 1.8));
 						}
 						else if ((int)array[1] == 3)
 						{
-							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.3f);
+							modifyStrength(PlayerController.instance.playerSteamID, currentGrabStrength * 1.3f);
 						}
 						else if ((int)array[1] == 4)
 						{
-							__instance.JumpForce *= 1.5f;
+							__instance.JumpForce = currentJumpForce * 1.5f;
 						}
+
 						if ((int)array[2] == 0)
 						{
-							__instance.CrouchSpeed = origCrouchSpeed;
-							__instance.MoveSpeed = origMoveSpeed;
-							__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 0.8f;
+							__instance.CrouchSpeed = currentCrouchSpeed * 0.8f;
+							__instance.MoveSpeed = currentMoveSpeed * 0.8f;
+							__instance.SprintSpeed = currentSprintSpeed * 0.8f;
 						}
 						else if ((int)array[2] == 1)
 						{
-							__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 0.8f;
-							__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 0.8f;
+							__instance.EnergyStart = currentMaxEnergy * 0.8f;
+							__instance.EnergyCurrent = currentEnergy * 0.8f;
 						}
 						else if ((int)array[2] == 2)
 						{
-							int num9 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-							int num10 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-							setHealth(PlayerController.instance.playerSteamID, (int)((double)num9 * 0.8), (int)((double)num10 * 0.8));
+							setHealth(PlayerController.instance.playerSteamID, (int)(currentMaxHealth * 0.8), (int)(currentHealth * 0.8));
 						}
 						else if ((int)array[2] == 3)
 						{
-							modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 0.8f);
+							modifyStrength(PlayerController.instance.playerSteamID, currentGrabStrength * 0.8f);
 						}
 						else if ((int)array[2] == 4)
 						{
-							__instance.JumpForce *= 0.7f;
+							__instance.JumpForce = currentJumpForce * 0.7f;
 						}
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameGambler.Value;
 						RepoRoles.GUIinstance.color = new Color(0.576f, 0f, 0.831f);
 						RepoRoles.GUIinstance.descColor = new Color(0.576f, 0f, 0.831f);
-						RepoRoles.GUIinstance.descText = array[0]?.ToString() + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = array[0]?.ToString() + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						break;
 					}
-				case 4:
+				case 4: // Strongman
 					{
 						if (!RepoRoles.enableStrongman.Value)
 						{
@@ -361,16 +312,18 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameStrongman.Value + "."));
-						RepoRoles.Logger.LogInfo((object)("Strength before: " + PhysGrabber.instance.grabStrength));
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.5f + 0.5f);
+
+						RepoRoles.Logger.LogInfo((object)("Strength before: " + currentGrabStrength));
+						modifyStrength(PlayerController.instance.playerSteamID, currentGrabStrength * 1.5f + 0.5f);
 						RepoRoles.Logger.LogInfo((object)("Strength after: " + PhysGrabber.instance.grabStrength));
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameStrongman.Value;
 						RepoRoles.GUIinstance.color = new Color(0.761f, 0.055f, 0.055f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecStrongman.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecStrongman.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.761f, 0.055f, 0.055f);
 						break;
 					}
-				case 5:
+				case 5: // Ranged Looter
 					{
 						if (!RepoRoles.enableRL.Value)
 						{
@@ -381,15 +334,17 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameRL.Value + "."));
-						PhysGrabber.instance.grabRange = (origGrabRange + (float)numberOfRangeUpgrades * 1f) * 2.5f;
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.2f);
+
+						PlayerAvatar.instance.physGrabber.grabRange = currentGrabRange * 2.5f;
+						modifyStrength(PlayerController.instance.playerSteamID, currentGrabStrength * 1.2f);
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRL.Value;
 						RepoRoles.GUIinstance.color = new Color(0.592f, 0.969f, 0.663f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRL.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRL.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.592f, 0.969f, 0.663f);
 						break;
 					}
-				case 6:
+				case 6: // Athletic
 					{
 						if (!RepoRoles.enableAthletic.Value)
 						{
@@ -400,17 +355,19 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameAthletic.Value + "."));
-						modifyStrength(PlayerController.instance.playerSteamID, (origGrabStrength + (float)numberOfStrengthUpgrades * 0.2f) * 1.3f);
-						__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f + 20f;
-						__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f + 20f;
-						__instance.JumpForce = origJumpForce + 3f;
+
+						modifyStrength(PlayerController.instance.playerSteamID, currentGrabStrength * 1.4f);
+						__instance.EnergyStart = currentMaxEnergy + 20f;
+						__instance.EnergyCurrent = currentEnergy + 20f;
+						__instance.JumpForce = currentJumpForce + 3f;
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameAthletic.Value;
 						RepoRoles.GUIinstance.color = Color.white;
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecAthletic.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecAthletic.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = Color.white;
 						break;
 					}
-				case 7:
+				case 7: // Mage
 					{
 						if (!RepoRoles.enableMage.Value)
 						{
@@ -418,30 +375,43 @@ namespace R.E.P.O.Roles
 							RepoRoles.Logger.LogInfo((object)"You got assigned a new random role because this one was disabled.");
 							break;
 						}
-						guiManager.ResetManaUI();
-						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
+
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameMage.Value + "."));
+
+						// Set mage flag and initial mana
 						guiManager.isMage = true;
 						guiManager.aviableMana = 8;
-						ManaHelper.CreateUI();
 						guiManager.manaTicks = 0;
-						int num13 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-						int num14 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-						if ((double)num14 * 0.5 > 0.0)
+
+						// Create UI if it doesn't exist (hidden by default)
+						ManaHelper.CreateUI();
+
+						// Update display based on current config
+						if (RepoRoles.GUIinstance != null)
 						{
-							setHealth(PlayerController.instance.playerSteamID, (int)((double)num13 * 0.5), (int)((double)num14 * 0.5));
+							RepoRoles.GUIinstance.UpdateManaDisplay();
+						}
+
+						// Adjust health for mage
+						if ((double)currentHealth * 0.5 > 0.0)
+						{
+							setHealth(PlayerController.instance.playerSteamID, (int)(currentMaxHealth * 0.5), (int)(currentHealth * 0.5));
 						}
 						else
 						{
-							setHealth(PlayerController.instance.playerSteamID, (int)((double)num13 * 0.5), num14);
+							setHealth(PlayerController.instance.playerSteamID, (int)(currentMaxHealth * 0.5), currentHealth);
 						}
+
+						// Set GUI text
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameMage.Value;
 						RepoRoles.GUIinstance.color = new Color(0f, 0.384f, 1f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecMage.Value + "\nPress " + ((object)RepoRoles.showSpellsKey.Value/*cast due to .constrained prefix*/).ToString() + " to see all your spells and press " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecMage.Value + "\nPress " +
+							((object)RepoRoles.showSpellsKey.Value).ToString() + " to see all your spells and press " +
+							((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0f, 0.384f, 1f);
 						break;
 					}
-				case 8:
+				case 8: // Reaper
 					{
 						if (!RepoRoles.enableReaper.Value)
 						{
@@ -452,18 +422,19 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameReaper.Value + "."));
+
 						harmonyPatcher.PatchAll(typeof(ReaperPatch));
 						setReaperStatus(PlayerController.instance.playerSteamID, isReaper: true);
-						int num11 = (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth);
-						int num12 = (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth);
-						setHealth(PlayerController.instance.playerSteamID, (int)((double)num11 * 1.5), (int)((double)num12 * 1.5));
+
+						setHealth(PlayerController.instance.playerSteamID, (int)(currentMaxHealth * 1.5), (int)(currentHealth * 1.5));
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameReaper.Value;
 						RepoRoles.GUIinstance.color = new Color(0.141f, 0.6f, 0.502f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecReaper.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecReaper.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.141f, 0.6f, 0.502f);
 						break;
 					}
-				case 9:
+				case 9: // Scout
 					{
 						if (!RepoRoles.enableScout.Value)
 						{
@@ -474,17 +445,19 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameScout.Value + "."));
+
 						isScout = true;
-						__instance.EnergyStart = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 2f;
-						__instance.EnergyCurrent = (origMaxEnergy + (float)numberOfStaminaUpgrades * 10f) * 2f;
+						__instance.EnergyStart = currentMaxEnergy * 2f;
+						__instance.EnergyCurrent = currentEnergy * 2f;
 						__instance.sprintRechargeAmount *= 2f;
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameScout.Value;
 						RepoRoles.GUIinstance.color = new Color(0.902f, 0.733f, 0.11f);
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecScout.Value.Replace("[G]", "[" + ((object)RepoRoles.scoutKey.Value/*cast due to .constrained prefix*/).ToString() + "]") + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecScout.Value.Replace("[G]", "[" + ((object)RepoRoles.scoutKey.Value).ToString() + "]") + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = new Color(0.902f, 0.733f, 0.11f);
 						break;
 					}
-				case 10:
+				case 10: // Regular
 					{
 						if (!RepoRoles.enableRegular.Value)
 						{
@@ -495,19 +468,21 @@ namespace R.E.P.O.Roles
 						guiManager.ResetManaUI();
 						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
 						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameRegular.Value + "."));
-						__instance.CrouchSpeed = origCrouchSpeed;
-						__instance.MoveSpeed = origMoveSpeed;
-						__instance.SprintSpeed = origSprintSpeed + (float)numberOfSpeedUpgrades * 1f;
-						__instance.JumpForce = origJumpForce;
-						__instance.EnergyStart = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
-						__instance.EnergyCurrent = origMaxEnergy + (float)numberOfStaminaUpgrades * 10f;
+
+						__instance.CrouchSpeed = currentCrouchSpeed;
+						__instance.MoveSpeed = currentMoveSpeed;
+						__instance.SprintSpeed = currentSprintSpeed;
+						__instance.JumpForce = currentJumpForce;
+						__instance.EnergyStart = currentMaxEnergy;
+						__instance.EnergyCurrent = currentEnergy;
+
 						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameRegular.Value;
 						RepoRoles.GUIinstance.color = Color.white;
-						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRegular.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value/*cast due to .constrained prefix*/).ToString() + " to continue";
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRegular.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = Color.white;
 						break;
 					}
-				}
 			}
 		}
 	}
+}

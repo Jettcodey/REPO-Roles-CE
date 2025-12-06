@@ -5,11 +5,14 @@ using Repo_Roles;
 using HarmonyLib;
 using Photon.Pun;
 using UnityEngine;
+using System.Collections;
 
 namespace R.E.P.O.Roles.patches
 {
 	public class guiManager : MonoBehaviour
 	{
+		private bool lastManaPosition = true;
+
 		public static bool showGUI = true;
 
 		public static bool isMage = false;
@@ -167,6 +170,7 @@ namespace R.E.P.O.Roles.patches
 				GUI.Label(new Rect(num + num3, num2 - num3, 200f, 50f), this.text, val2);
 				GUI.Label(new Rect(num + num3, num2 + num3, 200f, 50f), this.text, val2);
 				GUI.Label(new Rect(num, num2, 200f, 50f), this.text, val);
+
 				float num4 = Screen.width / 2 - 100;
 				float num5 = Screen.height / 2 + 40;
 				GUIStyle val3 = new GUIStyle();
@@ -278,28 +282,139 @@ namespace R.E.P.O.Roles.patches
 			}
 			if (showSpells && SemiFunc.RunIsLevel() && !SemiFunc.RunIsShop())
 			{
-				GUIStyle val9 = new GUIStyle();
-				val9.fontSize = 40;
-				val9.fontStyle = (FontStyle)1;
-				val9.richText = true;
-				val9.normal.textColor = new Color(0f, 0.384f, 1f);
-				val9.alignment = (TextAnchor)4;
-				val9.font = customFont;
-				GUIStyle val10 = new GUIStyle(val9);
-				val10.normal.textColor = Color.black;
-				val10.alignment = (TextAnchor)4;
-				val10.font = customFont;
-				string text = "<size=65>SPELLS</size>\n[" + ((object)RepoRoles.healKey.Value/*cast due to .constrained prefix*/).ToString() + "] Heal yourself for 5 health (1 Mana)\n\n[" + ((object)RepoRoles.staminaKey.Value/*cast due to .constrained prefix*/).ToString() + "] Regenerate your stamina to full (3 Mana)\n\n[" + ((object)RepoRoles.speedKey.Value/*cast due to .constrained prefix*/).ToString() + "] Become faster for 30 seconds (2 Mana)\n\n[" + ((object)RepoRoles.overchargeKey.Value/*cast due to .constrained prefix*/).ToString() + "] Boost the effectivity of spells used in the next 20 seconds (3 Mana)\n\n[" + ((object)RepoRoles.jumpKey.Value/*cast due to .constrained prefix*/).ToString() + "] Jump higher for 30 seconds (2 Mana)";
-				float num10 = 2f;
-				GUI.Label(new Rect(num - num10, num2, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num + num10, num2, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num, num2 - num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num, num2 + num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num - num10, num2 - num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num - num10, num2 + num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num + num10, num2 - num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num + num10, num2 + num10, 200f, 50f), text, val10);
-				GUI.Label(new Rect(num, num2, 200f, 50f), text, val9);
+				// tighter body (single newlines, no extra blank lines)
+				string headerText = "SPELLS";
+				string bodyText =
+					"[" + RepoRoles.healKey.Value.ToString() + "] Heal yourself for 5 health (1 Mana)\n"
+					+ "[" + RepoRoles.staminaKey.Value.ToString() + "] Regenerate your stamina to full (3 Mana)\n"
+					+ "[" + RepoRoles.speedKey.Value.ToString() + "] Become faster for 30 seconds (2 Mana)\n"
+					+ "[" + RepoRoles.overchargeKey.Value.ToString() + "] Boost the effectivity of spells used in the next 20 seconds (3 Mana)\n"
+					+ "[" + RepoRoles.jumpKey.Value.ToString() + "] Jump higher for 30 seconds (2 Mana)";
+
+				// center anchors
+				float centerX = Screen.width * 0.5f;
+				float centerY = Screen.height * 0.5f;
+
+				// width available to wrap the body
+				float areaWidth = Mathf.Clamp(Screen.width * 0.6f, 260f, 1200f);
+
+				// base styles
+				GUIStyle headerStyle = new GUIStyle();
+				headerStyle.richText = true;
+				headerStyle.wordWrap = true;
+				headerStyle.alignment = TextAnchor.MiddleCenter;
+				headerStyle.font = customFont;
+				headerStyle.fontStyle = FontStyle.Bold;
+
+				GUIStyle bodyStyle = new GUIStyle(headerStyle); // share common settings
+				bodyStyle.wordWrap = true;
+
+				GUIStyle outlineHeader = new GUIStyle(headerStyle);
+				outlineHeader.normal.textColor = Color.black;
+				GUIStyle outlineBody = new GUIStyle(bodyStyle);
+				outlineBody.normal.textColor = Color.black;
+
+				// helper to find font size that keeps rendered height below a limit
+				int GetFittingFontSize(string s, GUIStyle style, float width, int maxSize, int minSize, float maxAllowedHeight)
+				{
+					for (int size = maxSize; size >= minSize; size--)
+					{
+						style.fontSize = size;
+						float needed = style.CalcHeight(new GUIContent(s), width);
+						if (needed <= maxAllowedHeight)
+							return size;
+					}
+					return minSize;
+				}
+
+				// dynamic max font based on screen size (keeps scaling on very large screens)
+				int maxHeader = Mathf.Clamp(Mathf.RoundToInt(Screen.height * 0.09f), 24, 120); // ~9% of height
+				int maxBody = Mathf.Clamp(Mathf.RoundToInt(Screen.height * 0.045f), 14, 72);  // ~4.5% of height
+				int minHeader = 16;
+				int minBody = 12;
+
+				// limit: don't allow a single label to be taller than screen minus margin
+				float maxAllowedLabelHeight = Screen.height - 60f;
+
+				// find header size then body size. We allow header to be big; body must fit in remaining space
+				// First pick header size that fits (but header can be up to maxHeader)
+				int headerSize = GetFittingFontSize(headerText, headerStyle, areaWidth, maxHeader, minHeader, maxAllowedLabelHeight);
+				headerSize = Mathf.Max(minHeader, headerSize + 4); // keep your +4 bump
+				headerStyle.fontSize = headerSize;
+				outlineHeader.fontSize = headerSize;
+
+				// compute header rendered height
+				float headerHeight = headerStyle.CalcHeight(new GUIContent(headerText), areaWidth);
+
+				// Remaining vertical space for body (allow some margin)
+				float remainingForBody = Mathf.Max(60f, Screen.height - headerHeight - 80f);
+
+				// pick body size to fit inside remaining space
+				int bodySize = GetFittingFontSize(bodyText, bodyStyle, areaWidth, maxBody, minBody, remainingForBody);
+				bodySize = Mathf.Max(minBody, bodySize + 4); // same +4 bump
+				bodyStyle.fontSize = bodySize;
+				outlineBody.fontSize = bodySize;
+
+				// compute body rendered height
+				float bodyHeight = bodyStyle.CalcHeight(new GUIContent(bodyText), areaWidth);
+
+				// small gap between header and body. keep it proportional and small so spacing isn't huge
+				float gap = Mathf.Clamp(Mathf.RoundToInt(headerSize * 0.25f), 4, 14);
+
+				// total block height and rect centered on screen
+				float totalHeight = headerHeight + gap + bodyHeight;
+				Rect blockRect = new Rect(centerX - areaWidth * 0.5f, centerY - totalHeight * 0.5f, areaWidth, totalHeight);
+
+				// positions for header and body inside the block
+				Rect headerRect = new Rect(blockRect.x, blockRect.y, blockRect.width, headerHeight);
+				Rect bodyRect = new Rect(blockRect.x, blockRect.y + headerHeight + gap, blockRect.width, bodyHeight);
+
+				// draw outline / shadow for header and body (offset in 8 directions)
+				float offset = Mathf.Clamp(Screen.height * 0.0025f, 1f, 3f); // scale shadow a bit with resolution
+																			 // header outline
+				GUI.Label(new Rect(headerRect.x - offset, headerRect.y, headerRect.width, headerRect.height), headerText, outlineHeader);
+				GUI.Label(new Rect(headerRect.x + offset, headerRect.y, headerRect.width, headerRect.height), headerText, outlineHeader);
+				GUI.Label(new Rect(headerRect.x, headerRect.y - offset, headerRect.width, headerRect.height), headerText, outlineHeader);
+				GUI.Label(new Rect(headerRect.x, headerRect.y + offset, headerRect.width, headerRect.height), headerText, outlineHeader);
+				// body outline (do same offsets)
+				GUI.Label(new Rect(bodyRect.x - offset, bodyRect.y, bodyRect.width, bodyRect.height), bodyText, outlineBody);
+				GUI.Label(new Rect(bodyRect.x + offset, bodyRect.y, bodyRect.width, bodyRect.height), bodyText, outlineBody);
+				GUI.Label(new Rect(bodyRect.x, bodyRect.y - offset, bodyRect.width, bodyRect.height), bodyText, outlineBody);
+				GUI.Label(new Rect(bodyRect.x, bodyRect.y + offset, bodyRect.width, bodyRect.height), bodyText, outlineBody);
+
+				// main colored labels
+				GUIStyle headerColor = new GUIStyle(headerStyle);
+				headerColor.normal.textColor = new Color(0f, 0.384f, 1f);
+				GUIStyle bodyColor = new GUIStyle(bodyStyle);
+				bodyColor.normal.textColor = new Color(0f, 0.384f, 1f);
+
+				GUI.Label(headerRect, headerText, headerColor);
+				GUI.Label(bodyRect, bodyText, bodyColor);
+			}
+		}
+
+		public void InitializeMageDisplay()
+		{
+			if (!isMage) return;
+
+			// Clean up any existing UI
+			if (ManaHelper.val2 != null)
+			{
+				GameObject.Destroy(ManaHelper.val2);
+				ManaHelper.val2 = null;
+				ManaHelper.manaUI = null;
+			}
+
+			// Reset last position to force update
+			lastManaPosition = !RepoRoles.mageTopManaBool;
+
+			// Update display based on config
+			UpdateManaDisplay();
+
+			// Set initial mana value
+			if (!RepoRoles.mageTopManaBool && ManaHelper.manaUI != null)
+			{
+				ManaHelper.manaUI.SetMana(aviableMana, 8f);
 			}
 		}
 
@@ -313,34 +428,57 @@ namespace R.E.P.O.Roles.patches
 			ManaHelper.manaUI = null;
 		}
 
-		private void updateMana()
+		public void UpdateManaDisplay()
 		{
-			if (!isMage)
-				return;
+			if (!isMage) return;
 
-			if (ManaHelper.val2 == null || ManaHelper.val2.GetComponent<ManaUI>() == null)
+			// Ensure UI exists
+			if (ManaHelper.val2 == null)
 			{
-				RepoRoles.Logger.LogWarning("Mana UI missing or destroyed. Recreating...");
 				ManaHelper.CreateUI();
 			}
 
-			ManaHelper.val2.GetComponent<ManaUI>().SetMana(aviableMana, 8f);
+			// Show/hide based on config
+			if (RepoRoles.mageTopManaBool)
+			{
+				// TOP display: Hide custom UI (OnGUI will draw)
+				ManaHelper.ShowUI(false);
+			}
+			else
+			{
+				// LEFT display: Show custom UI
+				ManaHelper.ShowUI(true);
+				ManaHelper.UpdateManaValue();
+			}
+		}
+
+		private void updateMana()
+		{
+			if (!isMage) return;
+
+			// Update mana value in the appropriate display
+			if (RepoRoles.mageTopManaBool)
+			{
+				// TOP display updates automatically in OnGUI
+			}
+			else
+			{
+				// LEFT display: Update the custom UI
+				ManaHelper.UpdateManaValue();
+			}
 		}
 
 		private void Update()
 		{
+			// Check if mana position config has changed and update display
+			if (isMage && lastManaPosition != RepoRoles.mageTopManaBool)
+			{
+				UpdateManaDisplay();
+				lastManaPosition = RepoRoles.mageTopManaBool;
+			}
 			if (SemiFunc.RunIsLevel() && (int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth) <= 0)
 			{
 				isDead = true;
-			}
-			if (RepoRoles.mageTopManaBool && isMage && (Object)(object)ManaHelper.val != null && (Object)(object)ManaHelper.val2 != null && ManaHelper.val2.activeInHierarchy)
-			{
-				ManaHelper.val2.SetActive(false);
-			}
-			else if (!RepoRoles.mageTopManaBool && isMage && (Object)(object)ManaHelper.val != null && (Object)(object)ManaHelper.val2 != null && !ManaHelper.val2.activeInHierarchy)
-			{
-				ManaHelper.val2.SetActive(true);
-				((Behaviour)ManaHelper.val2.gameObject.GetComponent<ManaUI>().uiText).enabled = true;
 			}
 			if (!SemiFunc.RunIsLevel())
 			{
@@ -383,7 +521,7 @@ namespace R.E.P.O.Roles.patches
 							showManaUsage = true;
 							manaUsageTicker = 0;
 							manaUsageText = "Used Heal (-1 Mana)";
-							updateMana();
+							UpdateManaDisplay();
 						}
 					}
 					else if ((int)AccessTools.Field(typeof(PlayerHealth), "health").GetValue(PlayerAvatar.instance.playerHealth) != (int)AccessTools.Field(typeof(PlayerHealth), "maxHealth").GetValue(PlayerAvatar.instance.playerHealth) && aviableMana >= 1)
@@ -393,7 +531,7 @@ namespace R.E.P.O.Roles.patches
 						showManaUsage = true;
 						manaUsageTicker = 0;
 						manaUsageText = "Used Heal (-1 Mana)";
-						updateMana();
+						UpdateManaDisplay();
 					}
 				}
 				if (Input.GetKeyDown(RepoRoles.speedKey.Value) && !speedActive)
@@ -412,7 +550,7 @@ namespace R.E.P.O.Roles.patches
 						showManaUsage = true;
 						manaUsageTicker = 0;
 						manaUsageText = "Used Speed (-2 Mana)";
-						updateMana();
+						UpdateManaDisplay();
 						if (isOvercharged)
 						{
 							neededSpeedTicker = 3600;
@@ -432,7 +570,7 @@ namespace R.E.P.O.Roles.patches
 					showManaUsage = true;
 					manaUsageTicker = 0;
 					manaUsageText = "Used Overcharge (-3 Mana)";
-					updateMana();
+					UpdateManaDisplay();
 				}
 				if (Input.GetKeyDown(RepoRoles.jumpKey.Value) && !jumpActive)
 				{
@@ -446,7 +584,7 @@ namespace R.E.P.O.Roles.patches
 						showManaUsage = true;
 						manaUsageTicker = 0;
 						manaUsageText = "Used Jump Boost (-2 Mana)";
-						updateMana();
+						UpdateManaDisplay();
 						if (isOvercharged)
 						{
 							neededJumpTicker = 3600;
@@ -464,7 +602,7 @@ namespace R.E.P.O.Roles.patches
 					showManaUsage = true;
 					manaUsageTicker = 0;
 					manaUsageText = "Used Stamina Refill (-3 Mana)";
-					updateMana();
+					UpdateManaDisplay();
 				}
 			}
 			if (speedActive && speedTicker >= neededSpeedTicker)
@@ -478,6 +616,16 @@ namespace R.E.P.O.Roles.patches
 			{
 				PlayerController.instance.JumpForce = jumpOriginal;
 				jumpActive = false;
+			}
+			if (!isMage)
+			{
+				// Clean up UI when no longer a mage
+				if (ManaHelper.val2 != null)
+				{
+					GameObject.Destroy(ManaHelper.val2);
+					ManaHelper.val2 = null;
+					ManaHelper.manaUI = null;
+				}
 			}
 		}
 
@@ -532,7 +680,7 @@ namespace R.E.P.O.Roles.patches
 			{
 				aviableMana++;
 				manaTicks = 0;
-				updateMana();
+				UpdateManaDisplay();
 			}
 		}
 	}

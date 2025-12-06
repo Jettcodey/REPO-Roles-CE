@@ -15,13 +15,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static MenuLib.MenuAPI;
 using static MenuLib.MonoBehaviors.REPOSlider;
-using REPOLib.Objects.Sdk;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.0")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.1")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
-	[BepInDependency("MenuLib", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInDependency("nickklmao.menulib", BepInDependency.DependencyFlags.HardDependency)]
+	[BepInDependency("nickklmao.repoconfig", BepInDependency.DependencyFlags.HardDependency)]
+	[BepInDependency("PxntxrezStudio.REPOConomyPlus", BepInDependency.DependencyFlags.SoftDependency)]
 	public class RepoRoles : BaseUnityPlugin
 	{
 		public static RepoRoles Instance { get; private set; }
@@ -237,6 +238,15 @@ namespace Repo_Roles
 		{
 			mageTopManaConf.Value = a;
 			mageTopManaBool = a;
+
+			// Force save the config
+			Config.Save();
+
+			// Update mana display immediately if player is mage
+			if (guiManager.isMage && GUIinstance != null)
+			{
+				GUIinstance.UpdateManaDisplay();
+			}
 		}
 
 		public static string getPath()
@@ -267,9 +277,9 @@ namespace Repo_Roles
 			{
 				if ((UnityEngine.Object)(object)configPage == null)
 				{
-					configPage = MenuAPI.CreateREPOPopupPage("REPO Roles", 0, true, true, 1.5f);
+					configPage = MenuAPI.CreateREPOPopupPage("REPORoles Classic", 0, true, true, 1.5f);
 				}
-				buttonOpen = MenuAPI.CreateREPOButton("REPO Roles Config", (Action)delegate
+				buttonOpen = MenuAPI.CreateREPOButton("REPORoles Classic Config", (Action)delegate
 				{
 					configPage.OpenPage(false);
 				}, parent, new Vector2(500f, 10f));
@@ -277,7 +287,7 @@ namespace Repo_Roles
 				{
 					if ((UnityEngine.Object)(object)slider == null)
 					{
-						slider = MenuAPI.CreateREPOSlider("REPO Roles", "Choose your role", (Action<string>)delegate (string s)
+						slider = MenuAPI.CreateREPOSlider("REPORoles Classic", "Choose your role", (Action<string>)delegate (string s)
 						{
 							sliderConf(s);
 						}, scrollView, new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
@@ -320,7 +330,7 @@ namespace Repo_Roles
 					}
 				});
 			});
-			MenuAPI.AddElementToLobbyMenu((BuilderDelegate)delegate(Transform parent)
+			MenuAPI.AddElementToLobbyMenu((BuilderDelegate)delegate (Transform parent)
 			{
 				buttonOpenLobby = MenuAPI.CreateREPOButton("REPO Roles Config", (Action)delegate
 				{
@@ -351,6 +361,7 @@ namespace Repo_Roles
 			speedKey = Config.Bind(speedDef, (KeyCode)106, null);
 			overchargeKey = Config.Bind(overchargeDef, (KeyCode)111, null);
 			jumpKey = Config.Bind(jumpDef, (KeyCode)107, null);
+			scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
 			staminaKey = Config.Bind(staminaDef, (KeyCode)110, null);
 			customRoleNameRunner = Config.Bind(customRoleNameRunnerDef, "Runner", null);
 			customRoleNameTank = Config.Bind(customRoleNameTankDef, "Tank", null);
@@ -372,7 +383,6 @@ namespace Repo_Roles
 			customRoleDecReaper = Config.Bind(customRoleDesReaperDef, "For each enemy you and your friends kill, you become stronger!", null);
 			customRoleDecScout = Config.Bind(customRoleDesScoutDef, "Your stamina is more efficient and by pressing [G] you can see all enemies around you.", null);
 			customRoleDecRegular = Config.Bind(customRoleDesRegularDef, "You are just a regular Semibot. Nothing special.", null);
-			scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
