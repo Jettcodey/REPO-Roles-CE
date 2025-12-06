@@ -44,6 +44,7 @@ REPORoles Classic is a bugfix-only fork of [KingRobin72 (BobisMods)](https://thu
 ## Credits
 
 - **KingRobin72** – Original creator of the mod and its core design.
+- **Pxntxrez** - Updating the old Player Upgrade/Statsmanager Code and improve Compatibility with their [REPOConomyPlus](https://thunderstore.io/c/repo/p/PxntxrezStudio/REPOConomyPlus/) mod!
 - **Grimgar** – Original creator of the Icon and Mod Art in-game.
 - **surf** – Originally helped design the new mana UI (creator of [Walkie Talkies](https://thunderstore.io/c/repo/p/surfknasen/Walkie_Talkies/) mod).
 - **101m_m** – Originally designed the Mods Shop Upgrades.
