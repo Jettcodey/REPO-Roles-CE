@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.1")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.2")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.menulib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.repoconfig", BepInDependency.DependencyFlags.HardDependency)]
@@ -92,6 +92,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<string> savedRole;
 
+		public static ConfigEntry<bool> enableRoleUpgrades;
+
 		public static ConfigEntry<bool> assignRoleAfterRevive;
 
 		public static ConfigEntry<bool> mageTopManaConf;
@@ -157,6 +159,8 @@ namespace Repo_Roles
 		public ConfigDefinition jumpDef = new ConfigDefinition("Mage", "Jump Boost Spell");
 
 		public ConfigDefinition staminaDef = new ConfigDefinition("Mage", "Stamina Refill Spell");
+
+		public ConfigDefinition roleUpgrades = new ConfigDefinition("Upgrades", "Enable Role Upgrades in Shop");
 
 		public ConfigDefinition selectedRoleDef = new ConfigDefinition("Role", "Your selected role");
 
@@ -263,6 +267,7 @@ namespace Repo_Roles
 			mageTopManaConf = Config.Bind(mageTopManaDef, true, null);
 			mageTopManaBool = mageTopManaConf.Value;
 			showGUIAtStart = Config.Bind(showGUIAtStartDef, true, null);
+			enableRoleUpgrades = Config.Bind(roleUpgrades, true, null);
 			enableRunner = Config.Bind(enableRunnerDef, true, null);
 			enableTank = Config.Bind(enableTankDef, true, null);
 			enableGambler = Config.Bind(enableGamblerDef, true, null);
@@ -386,6 +391,7 @@ namespace Repo_Roles
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
+			harmony.PatchAll(typeof(ShopManagerPatch));
 			harmony.PatchAll(typeof(EnemyHealthPatch));
 			BundleLoader.LoadBundle(getPath(), delegate (AssetBundle assetBundle)
 			{

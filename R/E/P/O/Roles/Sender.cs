@@ -16,7 +16,7 @@ namespace R.E.P.O.Roles
 		[HarmonyPrefix]
 		private static void PrefixMethod()
 		{
-			if (!hasRanOnce)
+			if (!hasRanOnce && !SemiFunc.RunIsShop())
 			{
 				manager.assignRoleFromConfig(PlayerController.instance);
 				RepoRoles.Logger.LogInfo((object)"Successfully rolled role!");
