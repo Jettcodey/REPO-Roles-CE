@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.2")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "2.2.3")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.menulib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.repoconfig", BepInDependency.DependencyFlags.HardDependency)]

@@ -63,10 +63,23 @@ namespace R.E.P.O.Roles
 		{
 			if (photonEvent.Code == ReaperEvents.EV_REAPER_STATUS_CHANGE)
 			{
-				var data = photonEvent.CustomData as object[];
-				if (data == null || data.Length < 2) return;
-				string steam = data[0] as string ?? string.Empty;
-				bool isReaper = (bool)data[1];
+				if (photonEvent.CustomData is not object[] data || data.Length < 2)
+					return;
+
+				string steam = data[0] as string;
+				if (string.IsNullOrEmpty(steam))
+					return;
+
+				bool isReaper = false;
+
+				if (data[1] is bool b)
+					isReaper = b;
+				else if (data[1] is byte bt)
+					isReaper = bt != 0;
+				else if (data[1] is int i)
+					isReaper = i != 0;
+				else
+					return;
 
 				if (PhotonNetwork.IsMasterClient)
 				{
@@ -90,8 +103,10 @@ namespace R.E.P.O.Roles
 			if (photonEvent.Code == ReaperEvents.EV_REQUEST_REAPER_BUFFS)
 			{
 				if (!PhotonNetwork.IsMasterClient) return;
-				var data = photonEvent.CustomData as object[];
-				string killer = data != null && data.Length > 0 ? data[0] as string ?? string.Empty : string.Empty;
+				string killer = string.Empty;
+
+				if (photonEvent.CustomData is object[] data && data.Length > 0)
+					killer = data[0] as string ?? string.Empty;
 
 				string[] reapers;
 				lock (masterReapers)
@@ -116,9 +131,16 @@ namespace R.E.P.O.Roles
 			{
 				try
 				{
-					var data = photonEvent.CustomData as object[];
-					string killer = data?[0] as string ?? string.Empty;
-					string[] reapers = data?[1] as string[] ?? new string[0];
+					if (photonEvent.CustomData is not object[] data || data.Length < 2)
+						return;
+
+					string killer = data[0] as string ?? string.Empty;
+
+					string[] reapers;
+					if (data[1] is string[] arr)
+						reapers = arr;
+					else
+						return;
 #if DEBUG
 					RepoRoles.Logger.LogInfo($"[RpEsLr] giveReaperStatsRPC: received via event from killer={killer} reapersCount={reapers.Length}");
 #endif
