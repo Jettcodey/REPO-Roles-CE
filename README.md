@@ -1,12 +1,7 @@
 # REPORoles Classic
 
-REPORoles Classic is a bugfix-only fork of [KingRobin72 (BobisMods)](https://thunderstore.io/c/repo/p/BobisMods/REPORoles/)’s original **REPORoles** mod.
+REPORoles Classic is a fork of [KingRobin72 (BobisMods)](https://thunderstore.io/c/repo/p/BobisMods/REPORoles/)’s original **REPORoles** mod.
 
-❗ This version will **not** receive new features beyond the addition of the "Regular" Role — **only bug fixes** ❗.
-
-<!-- For new features and ongoing development, check out [REPO Roles CE (Community Edition)](https://thunderstore.io/c/repo/p/R3Labs/REPORoles_CE/). --> <!-- commented out/not released yet -->
-
----
 ## Quick Info
 - To select your role, go to **Mods → REPO Roles Classic**, or leave it on random for a surprise.
 
@@ -16,7 +11,6 @@ REPORoles Classic is a bugfix-only fork of [KingRobin72 (BobisMods)](https://thu
 
 - All keybinds are configurable in the mod’s settings.
 
----
 ## Available Roles
 - **Runner** – Moves faster than other players.
 - **Tank** – Has double health, but reduced speed.
@@ -34,13 +28,15 @@ REPORoles Classic is a bugfix-only fork of [KingRobin72 (BobisMods)](https://thu
 
 - Scout Cooldown: Reduce the time it takes for the Scout´s cooldown to regenerate. Max: 5
 
----
-
 ## Report Bugs:
 
 - You can report Bugs on our [Community Discord](https://discord.gg/AyG5Z8xR6m)
 
----
+## Note
+The license in this repo applies only to the code. The original author never publicly released their assets, so they are not included here.\
+We have permission to use, modify, and redistribute the assets as AssetBundles with this mod, but not to publish them publicly for others to reuse, modify, or redistribute.\
+If you want to use the assets, you must ask the original author for permission or create your own replacements.
+
 ## Credits
 
 - **KingRobin72** – Original creator of the mod and its core design.
