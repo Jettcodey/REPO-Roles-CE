@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BepInEx.Logging;
 using HarmonyLib;
 using Photon.Pun;
@@ -19,7 +20,7 @@ namespace R.E.P.O.Roles
 
 		public string chosenRole;
 
-		public int roleAmount = 10;
+		public int roleAmount = 11;
 
 		public RepoRoles repoRoles = new RepoRoles();
 
@@ -33,7 +34,9 @@ namespace R.E.P.O.Roles
 
 		public static bool isScout;
 
-		private string[] roleNames = new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" };
+		public static bool isEngineer;
+
+		private string[] roleNames = new string[12] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular", "Engineer" };
 
 		public ClassManager()
 		{
@@ -154,13 +157,28 @@ namespace R.E.P.O.Roles
 			isTank = false;
 			setReaperStatus(PlayerController.instance.playerSteamID, isReaper: false);
 			isScout = false;
+			isEngineer = false;
 
 			if (!SemiFunc.RunIsLevel() || SemiFunc.RunIsShop())
 			{
 				return;
 			}
 
-			if (!RepoRoles.enableRunner.Value && !RepoRoles.enableTank.Value && !RepoRoles.enableGambler.Value && !RepoRoles.enableStrongman.Value && !RepoRoles.enableRL.Value && !RepoRoles.enableAthletic.Value && !RepoRoles.enableMage.Value && !RepoRoles.enableReaper.Value && !RepoRoles.enableScout.Value && !RepoRoles.enableRegular.Value)
+			bool[] roleStatus = {
+				RepoRoles.enableRunner.Value,
+				RepoRoles.enableTank.Value,
+				RepoRoles.enableGambler.Value,
+				RepoRoles.enableStrongman.Value,
+				RepoRoles.enableRL.Value,
+				RepoRoles.enableAthletic.Value,
+				RepoRoles.enableMage.Value,
+				RepoRoles.enableReaper.Value,
+				RepoRoles.enableScout.Value,
+				RepoRoles.enableRegular.Value,
+				RepoRoles.enableEngineer.Value
+			};
+
+			if (!roleStatus.Any(isEnabled => isEnabled))
 			{
 				RepoRoles.Logger.LogError((object)"WARNING! You disabled all roles in the config file. You will not get any roles until you change it back.");
 				return;
@@ -480,6 +498,26 @@ namespace R.E.P.O.Roles
 						RepoRoles.GUIinstance.color = Color.white;
 						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecRegular.Value + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
 						RepoRoles.GUIinstance.descColor = Color.white;
+						break;
+					}
+				case 11: // Engineer
+					{
+						if (!RepoRoles.enableEngineer.Value)
+						{
+							assignRole(rnd.Next(1, roleAmount + 1), PlayerController.instance);
+							RepoRoles.Logger.LogInfo((object)"You got assigned a new random role because this one was disabled.");
+							break;
+						}
+						guiManager.ResetManaUI();
+						RepoRoles.Logger.LogInfo("Resetting Mana UI.");
+						RepoRoles.Logger.LogMessage((object)("Assigning role " + RepoRoles.customRoleNameEngineer.Value + "."));
+
+						isEngineer = true;
+
+						RepoRoles.GUIinstance.text = RepoRoles.customRoleNameEngineer.Value;
+						RepoRoles.GUIinstance.color = new Color(0.8f, 0.5f, 0.2f);
+						RepoRoles.GUIinstance.descText = RepoRoles.customRoleDecEngineer.Value + "\nPress " + "["+((object)RepoRoles.chargeItemKey.Value).ToString()+"]" + " While holding an item to Charge it" + "\nPress " + ((object)RepoRoles.toggleKey.Value).ToString() + " to continue";
+						RepoRoles.GUIinstance.descColor = new Color(0.8f, 0.5f, 0.2f);
 						break;
 					}
 			}

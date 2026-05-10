@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Repo_Roles;
+using R.E.P.O.Roles.patches;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -21,6 +22,11 @@ namespace R.E.P.O.Roles
 			else
 			{
 				RepoRoles.Logger.LogInfo((object)$"[PrArPch]: avatar already has ReaperManager steamID={__instance.steamID} pv={(__instance.photonView != null ? __instance.photonView.ViewID.ToString() : "null")}");
+			}
+
+			if (!__instance.gameObject.GetComponent<EngineerManager>())
+			{
+				__instance.gameObject.AddComponent<EngineerManager>();
 			}
 
 			// Make sure event listener exists on every client

@@ -18,7 +18,7 @@ using static MenuLib.MonoBehaviors.REPOSlider;
 
 namespace Repo_Roles
 {
-	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "3.0.0")]
+	[BepInPlugin("R3Labs.Repo_Roles.Classic", "REPO Roles Classic", "3.0.1")]
 	[BepInDependency("REPOLib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.menulib", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("nickklmao.repoconfig", BepInDependency.DependencyFlags.HardDependency)]
@@ -50,6 +50,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<KeyCode> scoutKey;
 
+		public static ConfigEntry<KeyCode> chargeItemKey;
+
 		public static ConfigEntry<string> customRoleNameRunner;
 
 		public static ConfigEntry<string> customRoleNameTank;
@@ -70,6 +72,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<string> customRoleNameRegular;
 
+		public static ConfigEntry<string> customRoleNameEngineer;
+
 		public static ConfigEntry<string> customRoleDecRunner;
 
 		public static ConfigEntry<string> customRoleDecTank;
@@ -89,6 +93,8 @@ namespace Repo_Roles
 		public static ConfigEntry<string> customRoleDecScout;
 
 		public static ConfigEntry<string> customRoleDecRegular;
+
+		public static ConfigEntry<string> customRoleDecEngineer;
 
 		public static ConfigEntry<string> savedRole;
 
@@ -128,6 +134,8 @@ namespace Repo_Roles
 
 		public ConfigDefinition customRoleNameRegularDef = new ConfigDefinition("Role Names", "Regular Name");
 
+		public ConfigDefinition customRoleNameEngineerDef = new ConfigDefinition("Role Names", "Engineer Name");
+
 		public ConfigDefinition customRoleDesRunnerDef = new ConfigDefinition("Role Descriptions", "Runner Description");
 
 		public ConfigDefinition customRoleDesTankDef = new ConfigDefinition("Role Descriptions", "Tank Description");
@@ -148,6 +156,8 @@ namespace Repo_Roles
 
 		public ConfigDefinition customRoleDesRegularDef = new ConfigDefinition("Role Descriptions", "Regular Description");
 
+		public ConfigDefinition customRoleDesEngineerDef = new ConfigDefinition("Role Descriptions", "Engineer Description");
+
 		public ConfigDefinition showSpellsDef = new ConfigDefinition("Mage", "Show Spells");
 
 		public ConfigDefinition healDef = new ConfigDefinition("Mage", "Healing Spell");
@@ -159,6 +169,8 @@ namespace Repo_Roles
 		public ConfigDefinition jumpDef = new ConfigDefinition("Mage", "Jump Boost Spell");
 
 		public ConfigDefinition staminaDef = new ConfigDefinition("Mage", "Stamina Refill Spell");
+
+		public ConfigDefinition chargeItemDef = new ConfigDefinition("Engineer", "Charge Held Item");
 
 		public ConfigDefinition roleUpgrades = new ConfigDefinition("Upgrades", "Enable Role Upgrades in Shop");
 
@@ -186,6 +198,8 @@ namespace Repo_Roles
 
 		public static ConfigEntry<bool> enableRegular;
 
+		public static ConfigEntry<bool> enableEngineer;
+
 		public ConfigDefinition enableRunnerDef = new ConfigDefinition("Role", "Enable Runner");
 
 		public ConfigDefinition enableTankDef = new ConfigDefinition("Role", "Enable Tank");
@@ -205,6 +219,8 @@ namespace Repo_Roles
 		public ConfigDefinition enableScoutDef = new ConfigDefinition("Role", "Enable Scout");
 
 		public ConfigDefinition enableRegularDef = new ConfigDefinition("Role", "Enable Regular");
+
+		public ConfigDefinition enableEngineerDef = new ConfigDefinition("Role", "Enable Engineer");
 
 		private REPOSlider slider;
 
@@ -278,6 +294,7 @@ namespace Repo_Roles
 			enableReaper = Config.Bind(enableReaperDef, true, null);
 			enableScout = Config.Bind(enableScoutDef, true, null);
 			enableRegular = Config.Bind(enableRegularDef, true, null);
+			enableEngineer = Config.Bind(enableEngineerDef, true, null);
 			MenuAPI.AddElementToSettingsMenu((BuilderDelegate)delegate (Transform parent)
 			{
 				if ((UnityEngine.Object)(object)configPage == null)
@@ -295,7 +312,7 @@ namespace Repo_Roles
 						slider = MenuAPI.CreateREPOSlider("REPORoles Classic", "Choose your role", (Action<string>)delegate (string s)
 						{
 							sliderConf(s);
-						}, scrollView, new string[11] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
+						}, scrollView, new string[12] { "Random", "Runner", "Tank", "Gambler", "Strongman", "Ranged Looter", "Athletic", "Mage", "Reaper", "Scout", "Regular", "Engineer" }, savedRole.Value, new Vector2(0f, 0f), "", "", (BarBehavior)0);
 					}
 					return ((REPOElement)slider).rectTransform;
 				}, 0f, 0f);
@@ -368,6 +385,7 @@ namespace Repo_Roles
 			jumpKey = Config.Bind(jumpDef, (KeyCode)107, null);
 			scoutKey = Config.Bind(scoutButtonDef, (KeyCode)103, null);
 			staminaKey = Config.Bind(staminaDef, (KeyCode)110, null);
+			chargeItemKey = Config.Bind(chargeItemDef, (KeyCode)99, null);
 			customRoleNameRunner = Config.Bind(customRoleNameRunnerDef, "Runner", null);
 			customRoleNameTank = Config.Bind(customRoleNameTankDef, "Tank", null);
 			customRoleNameGambler = Config.Bind(customRoleNameGamblerDef, "Gambler", null);
@@ -378,6 +396,7 @@ namespace Repo_Roles
 			customRoleNameReaper = Config.Bind(customRoleNameReaperDef, "Reaper", null);
 			customRoleNameScout = Config.Bind(customRoleNameScoutDef, "Scout", null);
 			customRoleNameRegular = Config.Bind(customRoleNameRegularDef, "Regular", null);
+			customRoleNameEngineer = Config.Bind(customRoleNameEngineerDef, "Engineer", null);
 			customRoleDecRunner = Config.Bind(customRoleDesRunnerDef, "You have more stamina and run much faster than everyone else!", null);
 			customRoleDecTank = Config.Bind(customRoleDesTankDef, "You walk slower but your hp is doubled!", null);
 			customRoleDecGambler = Config.Bind(customRoleDesGamblerDef, "You rolled random effects:", null);
@@ -388,6 +407,7 @@ namespace Repo_Roles
 			customRoleDecReaper = Config.Bind(customRoleDesReaperDef, "For each enemy you and your friends kill, you become stronger!", null);
 			customRoleDecScout = Config.Bind(customRoleDesScoutDef, "Your stamina is more efficient and by pressing [G] you can see all enemies around you.", null);
 			customRoleDecRegular = Config.Bind(customRoleDesRegularDef, "You are just a regular Semibot. Nothing special.", null);
+			customRoleDecEngineer = Config.Bind(customRoleDesEngineerDef, "You can recharge Items with on charge but you lose Stamina", null);
 			harmony.PatchAll(typeof(PunManagerPatch));
 			harmony.PatchAll(typeof(PlayerAvatarPatch));
 			harmony.PatchAll(typeof(StatsManagerPatch));
