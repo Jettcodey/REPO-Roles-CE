@@ -22,6 +22,7 @@ REPORoles Classic is a fork of [KingRobin72 (BobisMods)](https://thunderstore.io
 - **Reaper** – Grows stronger with each enemy defeated by you or your team.
 - **Scout** – Uses less stamina and can see enemies through walls.
 - **Regular** – You are just a regular Semibot. Nothing special.
+- **Engineer** - Can uses their Stamina to recharge Item use.
 
 ## Upgrades
 - Mana Regeneration: Decrease the time for mana to regenerate as Mage. Max: 5
